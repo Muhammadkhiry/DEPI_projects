@@ -26,7 +26,7 @@ class ToDoApp extends StatelessWidget {
           builder: (context, state) {
             if (state is UserInitialState)
               return LoginView();
-            else
+            else 
               return HomeView();
           },
         ),
