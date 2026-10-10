@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:to_do_app/cubits/user_cubit/user_cubit.dart';
+import 'package:to_do_app/cubit/user_cubit/user_cubit.dart';
 import 'package:to_do_app/widgets/custom_button.dart';
 import 'package:to_do_app/widgets/custom_text_field.dart';
 
