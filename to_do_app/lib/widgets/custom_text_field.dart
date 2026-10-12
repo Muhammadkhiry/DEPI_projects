@@ -7,18 +7,21 @@ class CustomTextField extends StatelessWidget {
     required this.icon,
     this.onTap,
     this.readOnly = false,
-    this.controller, 
+    this.controller,
+    required this.obscureText,
   });
 
   final String label;
   final String icon;
   final VoidCallback? onTap;
   final bool readOnly;
-  final TextEditingController? controller; 
+  final bool obscureText;
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      obscureText: obscureText,
       controller: controller,
       onTap: onTap,
       readOnly: readOnly,
