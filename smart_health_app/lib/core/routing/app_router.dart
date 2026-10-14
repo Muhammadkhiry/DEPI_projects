@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/features/auth/presentation/views/complete_profile_view.dart';
+import 'package:smart_health_app/features/auth/presentation/views/forgot_password_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/login_view.dart';
+import 'package:smart_health_app/features/auth/presentation/views/reset_sent_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/signup_view.dart';
+import 'package:smart_health_app/features/auth/presentation/views/verify_email_view.dart';
+import 'package:smart_health_app/features/home/presentation/views/notifications_view.dart';
 import 'package:smart_health_app/features/onboarding/presentation/views/onboarding_view.dart';
+import 'package:smart_health_app/features/profile/presentation/views/account_privacy_view.dart';
+import 'package:smart_health_app/features/profile/presentation/views/medical_info_view.dart';
+import 'package:smart_health_app/features/profile/presentation/views/personal_info_view.dart';
+import 'package:smart_health_app/features/profile/presentation/views/profile_view.dart';
 
 import '../theme/app_colors.dart';
 import 'routes.dart';
@@ -32,10 +41,6 @@ final GoRouter appRouter = GoRouter(
       path: Routes.onboarding,
       builder: (context, state) => const OnboardingView(),
     ),
-    GoRoute(
-      path: Routes.login,
-      builder: (context, state) => _placeholder('Login Screen'),
-    ),
     GoRoute(path: Routes.login, builder: (context, state) => const LoginView()),
     GoRoute(
       path: Routes.signUp,
@@ -43,19 +48,19 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: Routes.forgotPassword,
-      builder: (context, state) => _placeholder('Forgot Password Screen'),
+      builder: (context, state) => const ForgotPasswordView(),
     ),
     GoRoute(
       path: Routes.resetSent,
-      builder: (context, state) => _placeholder('Reset Link Sent Screen'),
+      builder: (context, state) => const ResetSentView(),
     ),
     GoRoute(
       path: Routes.verifyEmail,
-      builder: (context, state) => _placeholder('Verify Email Screen'),
+      builder: (context, state) => const VerifyEmailView(),
     ),
     GoRoute(
       path: Routes.completeProfile,
-      builder: (context, state) => _placeholder('Complete Profile Screen'),
+      builder: (context, state) => const CompleteProfileView(),
     ),
 
     // 2. Main 5-Tab Shell Navigation
@@ -248,25 +253,23 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: Routes.profile,
-              builder: (context, state) => _placeholder('Profile Dashboard'),
+              builder: (context, state) => const ProfileView(),
               routes: [
                 GoRoute(
                   path: 'personal-info',
-                  builder: (context, state) => _placeholder('Personal Info'),
+                  builder: (context, state) => const PersonalInfoView(),
                 ),
                 GoRoute(
                   path: 'medical-info',
-                  builder: (context, state) => _placeholder('Medical Info'),
+                  builder: (context, state) => const MedicalInfoView(),
                 ),
                 GoRoute(
                   path: 'notification-settings',
-                  builder: (context, state) =>
-                      _placeholder('Notification Settings'),
+                  builder: (context, state) => const NotificationSettingsView(),
                 ),
                 GoRoute(
                   path: 'account-privacy',
-                  builder: (context, state) =>
-                      _placeholder('Account & Privacy'),
+                  builder: (context, state) => const AccountPrivacyView(),
                 ),
                 GoRoute(
                   path: 'help-center',

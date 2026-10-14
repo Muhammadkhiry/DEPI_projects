@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/routing/routes.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -54,7 +55,7 @@ class LoginView extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () => context.push('/forgot-password'),
+                  onPressed: () => context.push(Routes.forgotPassword),
                   child: const Text(
                     'Forgot Password?',
                     style: TextStyle(
@@ -69,7 +70,7 @@ class LoginView extends StatelessWidget {
               // Submit Button
               CustomButton(
                 text: 'Log In',
-                onPressed: () => context.go('/home'),
+                onPressed: () => context.go(Routes.home),
               ),
               const SizedBox(height: 24),
 
@@ -82,7 +83,7 @@ class LoginView extends StatelessWidget {
                     style: AppTextStyles.bodyMedium,
                   ),
                   GestureDetector(
-                    onTap: () => context.push('/signup'),
+                    onTap: () => context.push(Routes.signUp),
                     child: const Text(
                       'Sign Up',
                       style: TextStyle(
