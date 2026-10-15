@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/constants/app_assets.dart';
 import 'package:smart_health_app/core/routing/routes.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -7,8 +9,15 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
   const LoginView({super.key});
+
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
+  bool isObscure = true;
 
   @override
   Widget build(BuildContext context) {
@@ -22,35 +31,62 @@ class LoginView extends StatelessWidget {
             children: [
               const SizedBox(height: 30),
               // Header
-              Text('Welcome Back 👋', style: AppTextStyles.headlineLarge),
-              const SizedBox(height: 8),
-              Text(
-                'Sign in to access your health dashboard and appointments.',
-                style: AppTextStyles.bodyMedium,
+              SizedBox(
+                height: 36,
+                child: Row(
+                  children: [
+                    SvgPicture.asset(AppAssets.authIcon_1),
+                    SizedBox(width: 10),
+                    Text('Smart Health', style: AppTextStyles.headlineLarge),
+                  ],
+                ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: 24),
+              SizedBox(
+                height: 61,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Welcome back', style: AppTextStyles.headlineLarge),
+                    SizedBox(height: 4),
+                    Text(
+                      'Log in to manage your appointments and records.',
+                      style: AppTextStyles.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
 
               // Form
               const CustomTextField(
                 label: 'Email Address',
-                hintText: 'Enter your email',
-                prefixIcon: Icon(
+                hintText: 'e.g. example@gmail.com',
+                suffixIcon: Icon(
                   Icons.email_outlined,
                   color: AppColors.primary,
                 ),
               ),
-              const SizedBox(height: 20),
-              const CustomTextField(
+              const SizedBox(height: 16),
+              CustomTextField(
                 label: 'Password',
-                hintText: 'Enter your password',
-                isPassword: true,
-                prefixIcon: Icon(Icons.lock_outline, color: AppColors.primary),
-                suffixIcon: Icon(
-                  Icons.visibility_off_outlined,
+                hintText: '••••••••••••',
+                isPassword: isObscure,
+                suffixIcon: IconButton(
                   color: AppColors.textMuted,
+                  onPressed: () {
+                    setState(() {
+                      isObscure = !isObscure;
+                    });
+                  },
+                  icon: Icon(
+                    isObscure
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                  ),
                 ),
               ),
-
+              const SizedBox(height: 10),
               // Forgot Password Link
               Align(
                 alignment: Alignment.centerRight,
@@ -58,22 +94,30 @@ class LoginView extends StatelessWidget {
                   onPressed: () => context.push(Routes.forgotPassword),
                   child: const Text(
                     'Forgot Password?',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTextStyles.bodyMedium,
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
               // Submit Button
               CustomButton(
                 text: 'Log In',
                 onPressed: () => context.go(Routes.home),
               ),
-              const SizedBox(height: 24),
-
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(AppAssets.lock),
+                  const SizedBox(width: 3),
+                  Text(
+                    "Your health data stays private to your account.",
+                    style: AppTextStyles.bodyMedium,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
               // Sign Up Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

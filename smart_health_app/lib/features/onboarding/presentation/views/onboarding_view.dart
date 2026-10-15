@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/constants/app_assets.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/custom_button.dart';
@@ -7,8 +10,13 @@ import '../../../../core/widgets/custom_button.dart';
 class OnboardingModel {
   final String title;
   final String description;
+  final String imagePath;
 
-  OnboardingModel({required this.title, required this.description});
+  OnboardingModel({
+    required this.title,
+    required this.description,
+    required this.imagePath,
+  });
 }
 
 class OnboardingView extends StatefulWidget {
@@ -24,16 +32,22 @@ class _OnboardingViewState extends State<OnboardingView> {
 
   final List<OnboardingModel> _pages = [
     OnboardingModel(
-      title: 'Easy Doctor Booking',
-      description: 'Book appointments with top medical specialists quickly and seamlessly.',
+      title: "Book Top Doctors Easily",
+      description: """Find specialists near you and book a visit in 
+      a few taps.""",
+      imagePath: AppAssets.bookDoc,
     ),
     OnboardingModel(
-      title: 'Blood Donation Network',
-      description: 'Connect with nearby donors or request blood urgently whenever needed.',
+      title: 'Save Lives by Donating Blood',
+      description: '''See open blood requests near you and 
+      offer to donate.''',
+      imagePath: AppAssets.donatingBlood,
     ),
     OnboardingModel(
-      title: 'Smart Medical Records',
-      description: 'Scan, save, and access all your medical prescriptions and reports in one place.',
+      title: 'Scan & Keep Health Records',
+      description: '''Scan prescriptions and lab reports and 
+      keep them in one private place.''',
+      imagePath: AppAssets.scanRecord,
     ),
   ];
 
@@ -64,11 +78,14 @@ class _OnboardingViewState extends State<OnboardingView> {
                   onPressed: () => context.go('/login'),
                   child: const Text(
                     'Skip',
-                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-              
+
               // Page View Section
               Expanded(
                 child: PageView.builder(
@@ -89,14 +106,10 @@ class _OnboardingViewState extends State<OnboardingView> {
                           height: 260,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
+                            // color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Icon(
-                            Icons.health_and_safety_outlined,
-                            size: 100,
-                            color: AppColors.primary,
-                          ),
+                          child: SvgPicture.asset(_pages[index].imagePath),
                         ),
                         const SizedBox(height: 40),
                         Text(
@@ -127,7 +140,9 @@ class _OnboardingViewState extends State<OnboardingView> {
                     height: 8,
                     width: _currentIndex == index ? 24 : 8,
                     decoration: BoxDecoration(
-                      color: _currentIndex == index ? AppColors.primary : AppColors.border,
+                      color: _currentIndex == index
+                          ? AppColors.primary
+                          : AppColors.border,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -135,10 +150,12 @@ class _OnboardingViewState extends State<OnboardingView> {
               ),
               const SizedBox(height: 32),
               CustomButton(
-                text: _currentIndex == _pages.length - 1 ? 'Get Started' : 'Next',
+                text: _currentIndex == _pages.length - 1
+                    ? 'Get Started'
+                    : 'Next',
                 onPressed: _onNextPressed,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 95),
             ],
           ),
         ),
