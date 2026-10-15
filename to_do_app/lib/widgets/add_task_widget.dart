@@ -40,6 +40,7 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
               label: "Task Title",
               icon: "assets/checklist.png",
               controller: titleController,
+              obscureText: false,
             ),
             SizedBox(height: 25),
             CustomTextField(
@@ -57,7 +58,6 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
                   builder: (BuildContext context, Widget? child) {
                     return Theme(
                       data: Theme.of(context).copyWith(
-                        useMaterial3: true,
                         colorScheme: const ColorScheme.light(
                           primary: Color(0xFF00B4D8),
                           onPrimary: Colors.white,
@@ -82,6 +82,7 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
                   dateController.text = formattedDate;
                 }
               },
+              obscureText: false,
             ),
 
             SizedBox(height: 25),

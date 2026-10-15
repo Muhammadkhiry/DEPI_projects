@@ -6,6 +6,7 @@ import 'package:to_do_app/cubit/task_cubit/tasks_states.dart';
 import 'package:to_do_app/cubit/user_cubit/user_cubit.dart';
 import 'package:to_do_app/models/task_model.dart';
 import 'package:to_do_app/widgets/add_task_widget.dart';
+import 'package:to_do_app/widgets/custom_drawer.dart';
 import 'package:to_do_app/widgets/no_tasks_widget.dart';
 import 'package:to_do_app/widgets/task_builder.dart';
 
@@ -13,8 +14,6 @@ class HomeView extends StatelessWidget {
   HomeView({super.key});
 
   final DateTime now = DateTime.now();
-  late final DateTime date = DateTime(now.year, now.month, now.day);
-  late final String shortMonthName = DateFormat('MMM').format(now);
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +21,13 @@ class HomeView extends StatelessWidget {
 
     return BlocBuilder<TasksCubit, TasksStates>(
       builder: (context, state) {
+        final tasksCubit = BlocProvider.of<TasksCubit>(context);
+        final int completedCount = tasksCubit.completedTasks.length;
+        final int totalCount = completedCount + tasksCubit.tasks.length;
+        final double progressValue = totalCount == 0
+            ? 0.0
+            : (completedCount / totalCount);
+
         return DefaultTabController(
           length: 2,
           child: Scaffold(
@@ -42,26 +48,23 @@ class HomeView extends StatelessWidget {
                         right: 20,
                         top: 16,
                       ),
-                      child: AddTaskWidget(),
+                      child: const AddTaskWidget(),
                     );
                   },
                 );
               },
             ),
             backgroundColor: const Color(0xFFF8FAFC),
+            drawer: const CustomDrawer(),
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              leading: const Icon(Icons.menu, color: Colors.black),
-              actions: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.notifications_none,
-                    color: Colors.black,
-                  ),
-                  onPressed: () {},
+              leading: Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.black),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
                 ),
-              ],
+              ),
             ),
             body: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -77,7 +80,7 @@ class HomeView extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "Today: $shortMonthName ${date.day}, ${date.year}",
+                    "Today: ${DateFormat('MMM dd, yyyy').format(now)}",
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -103,13 +106,6 @@ class HomeView extends StatelessWidget {
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -130,41 +126,32 @@ class HomeView extends StatelessWidget {
                             Text(
                               "Focus on progress, not perfection.",
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 fontSize: 12,
                               ),
                             ),
                           ],
                         ),
                         SizedBox(
-                          width: 91,
-                          height: 91,
+                          width: 80,
+                          height: 80,
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
                               CircularProgressIndicator(
-                                value:
-                                    BlocProvider.of<TasksCubit>(
-                                      context,
-                                    ).completedTasks.length.toDouble() /
-                                    (BlocProvider.of<TasksCubit>(
-                                          context,
-                                        ).completedTasks.length.toDouble() +
-                                        BlocProvider.of<TasksCubit>(
-                                          context,
-                                        ).tasks.length.toDouble()),
-                                strokeWidth: 11,
-                                backgroundColor: Colors.white.withOpacity(0.1),
+                                value: progressValue,
+                                strokeWidth: 8,
+                                backgroundColor: Colors.white.withValues(alpha: 0.1),
                                 valueColor: const AlwaysStoppedAnimation<Color>(
                                   Colors.tealAccent,
                                 ),
                               ),
                               Center(
                                 child: Text(
-                                  "${BlocProvider.of<TasksCubit>(context).completedTasks.length} / ${BlocProvider.of<TasksCubit>(context).completedTasks.length + BlocProvider.of<TasksCubit>(context).tasks.length}",
-                                  style: TextStyle(
+                                  "$completedCount / $totalCount",
+                                  style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -190,7 +177,6 @@ class HomeView extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 10),
-
                   if (state is TasksLoading)
                     const Expanded(
                       child: Center(child: CircularProgressIndicator()),
@@ -199,12 +185,8 @@ class HomeView extends StatelessWidget {
                     Expanded(
                       child: TabBarView(
                         children: [
-                          buildTaskList(
-                            state.tasks,
-                          ), // Tab 1: All / Active Tasks
-                          buildTaskList(
-                            state.completedTasks,
-                          ), // Tab 2: Completed Tasks
+                          buildTaskList(state.tasks),
+                          buildTaskList(state.completedTasks),
                         ],
                       ),
                     )
