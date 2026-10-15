@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/constants/app_assets.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/custom_button.dart';
@@ -26,24 +29,34 @@ class SignupView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Create Account 🚀', style: AppTextStyles.headlineLarge),
-              const SizedBox(height: 8),
-              Text(
-                'Join Smart Health to connect with doctors and health services.',
-                style: AppTextStyles.bodyMedium,
+              Row(
+                children: [
+                  SvgPicture.asset(AppAssets.authIcon_2),
+                  SizedBox(width: 10),
+                  Text('Smart Health', style: AppTextStyles.headlineLarge),
+                ],
               ),
+              const SizedBox(height: 8),
+              Text('''Join Smart Health to manage appointments and 
+records.''', style: AppTextStyles.bodyMedium),
               const SizedBox(height: 32),
 
               const CustomTextField(
                 label: 'Full Name',
                 hintText: 'Enter your full name',
-                prefixIcon: Icon(Icons.person_outline, color: AppColors.primary),
+                prefixIcon: Icon(
+                  Icons.person_outline,
+                  color: AppColors.primary,
+                ),
               ),
               const SizedBox(height: 16),
               const CustomTextField(
                 label: 'Email Address',
                 hintText: 'Enter your email',
-                prefixIcon: Icon(Icons.email_outlined, color: AppColors.primary),
+                prefixIcon: Icon(
+                  Icons.email_outlined,
+                  color: AppColors.primary,
+                ),
               ),
               const SizedBox(height: 16),
               const CustomTextField(
@@ -63,7 +76,10 @@ class SignupView extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Already have an account? ', style: AppTextStyles.bodyMedium),
+                  const Text(
+                    'Already have an account? ',
+                    style: AppTextStyles.bodyMedium,
+                  ),
                   GestureDetector(
                     onTap: () => context.pop(),
                     child: const Text(

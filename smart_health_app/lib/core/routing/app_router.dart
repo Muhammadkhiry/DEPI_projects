@@ -60,7 +60,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: Routes.completeProfile,
-      builder: (context, state) => const CompleteProfileView(),
+      builder: (context, state) => _placeholder("CompleteProfileView") //const CompleteProfileView(),
     ),
 
     // 2. Main 5-Tab Shell Navigation
@@ -253,23 +253,23 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: Routes.profile,
-              builder: (context, state) => const ProfileView(),
+              builder: (context, state) => _placeholder("ProfileView") ,//const ProfileView(),
               routes: [
                 GoRoute(
                   path: 'personal-info',
-                  builder: (context, state) => const PersonalInfoView(),
+                  builder: (context, state) =>_placeholder("PersonalInfoView") // const PersonalInfoView(),
                 ),
                 GoRoute(
                   path: 'medical-info',
-                  builder: (context, state) => const MedicalInfoView(),
+                  builder: (context, state) =>_placeholder("MedicalInfoView") // const MedicalInfoView(),
                 ),
                 GoRoute(
                   path: 'notification-settings',
-                  builder: (context, state) => const NotificationSettingsView(),
+                  builder: (context, state) =>_placeholder("NotificationSettingsView") // const NotificationSettingsView(),
                 ),
                 GoRoute(
                   path: 'account-privacy',
-                  builder: (context, state) => const AccountPrivacyView(),
+                  builder: (context, state) =>_placeholder("AccountPrivacyView") // const AccountPrivacyView(),
                 ),
                 GoRoute(
                   path: 'help-center',
