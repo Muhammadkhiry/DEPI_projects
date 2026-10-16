@@ -36,34 +36,43 @@ class SignupView extends StatelessWidget {
                   Text('Smart Health', style: AppTextStyles.headlineLarge),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text('''Join Smart Health to manage appointments and 
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 77,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Create your account',
+                      style: AppTextStyles.headlineLarge,
+                    ),
+                    SizedBox(height: 4),
+                    Text('''Join Smart Health to manage appointments and
 records.''', style: AppTextStyles.bodyMedium),
-              const SizedBox(height: 32),
-
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
               const CustomTextField(
                 label: 'Full Name',
                 hintText: 'Enter your full name',
-                prefixIcon: Icon(
-                  Icons.person_outline,
-                  color: AppColors.primary,
-                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               const CustomTextField(
                 label: 'Email Address',
                 hintText: 'Enter your email',
-                prefixIcon: Icon(
-                  Icons.email_outlined,
-                  color: AppColors.primary,
-                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               const CustomTextField(
                 label: 'Password',
                 hintText: 'Create a strong password',
                 isPassword: true,
-                prefixIcon: Icon(Icons.lock_outline, color: AppColors.primary),
+              ),
+              const SizedBox(height: 20),
+              const CustomTextField(
+                label: 'Confirm Password',
+                hintText: 'Create a strong password',
+                isPassword: true,
               ),
               const SizedBox(height: 28),
 
@@ -89,6 +98,18 @@ records.''', style: AppTextStyles.bodyMedium),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(AppAssets.lock),
+                  const SizedBox(width: 3),
+                  Text(
+                    "Stored securely in your private account.",
+                    style: AppTextStyles.bodyMedium,
                   ),
                 ],
               ),
