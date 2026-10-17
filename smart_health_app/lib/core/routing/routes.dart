@@ -13,5 +13,8 @@ abstract class Routes {
   static const String bloodDonation = '/bloodDonation';
   static const String medicalRecords = '/medicalRecords';
   static const String profile = '/profile';
-  static const String personalInfo = '/personalInfo';
+
+  // Sub-routes under /profile
+  static const String personalInfo = 'personalInfo';
+  static const String medicalInfo = 'medicalInfo';
 }
