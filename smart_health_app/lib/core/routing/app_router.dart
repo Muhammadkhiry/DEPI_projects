@@ -264,11 +264,9 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const MedicalInfoView(),
                 ),
                 GoRoute(
-                  path: 'notification-settings',
-                  builder: (context, state) => _placeholder(
-                    "NotificationSettingsView",
-                  ), // const NotificationSettingsView(),
-                ),
+                  path: Routes.notification,
+                  builder: (context, state) => const NotificationSettingsView(),
+                ), // const NotificationSettingsView(),
                 GoRoute(
                   path: 'account-privacy',
                   builder: (context, state) => _placeholder(
