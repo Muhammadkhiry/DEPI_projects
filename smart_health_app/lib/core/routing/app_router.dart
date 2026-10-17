@@ -268,10 +268,8 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const NotificationSettingsView(),
                 ), // const NotificationSettingsView(),
                 GoRoute(
-                  path: 'account-privacy',
-                  builder: (context, state) => _placeholder(
-                    "AccountPrivacyView",
-                  ), // const AccountPrivacyView(),
+                  path: Routes.accountPrivacy,
+                  builder: (context, state) => const AccountPrivacyView(),
                 ),
                 GoRoute(
                   path: 'help-center',

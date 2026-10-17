@@ -92,7 +92,9 @@ class ProfileView extends StatelessWidget {
                   _buildProfileTile(
                     icon: Icons.security_outlined,
                     title: 'Account & Privacy',
-                    onTap: () => context.push('/profile/account-privacy'),
+                    onTap: () => context.push(
+                      "${Routes.profile}/${Routes.accountPrivacy}",
+                    ),
                   ),
                   _buildProfileTile(
                     icon: Icons.help_outline,
