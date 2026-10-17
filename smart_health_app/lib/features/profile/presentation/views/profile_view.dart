@@ -49,7 +49,7 @@ class ProfileView extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     'khairy@example.com',
-                    style: TextStyle(color: AppColors.white.withOpacity(0.8)),
+                    style: TextStyle(color: AppColors.white.withValues(alpha: 0.8)),
                   ),
                 ],
               ),

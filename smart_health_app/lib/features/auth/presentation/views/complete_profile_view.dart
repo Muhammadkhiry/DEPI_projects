@@ -38,7 +38,7 @@ class CompleteProfileView extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundColor: AppColors.primary.withOpacity(0.1),
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                       child: const Icon(Icons.person, size: 60, color: AppColors.primary),
                     ),
                     Positioned(
