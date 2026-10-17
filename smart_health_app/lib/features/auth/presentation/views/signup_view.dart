@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_health_app/core/constants/app_assets.dart';
+import 'package:smart_health_app/core/routing/routes.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -78,7 +79,7 @@ records.''', style: AppTextStyles.bodyMedium),
 
               CustomButton(
                 text: 'Sign Up',
-                onPressed: () => context.push('/verify-email'),
+                onPressed: () => context.push(Routes.verifyEmail),
               ),
               const SizedBox(height: 24),
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/routing/routes.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -46,7 +47,7 @@ class VerifyEmailView extends StatelessWidget {
               const SizedBox(height: 40),
               CustomButton(
                 text: 'Continue to Complete Profile',
-                onPressed: () => context.go('/complete-profile'),
+                onPressed: () => context.go(Routes.completeProfile),
               ),
               const SizedBox(height: 16),
               TextButton(

@@ -253,20 +253,15 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: Routes.profile,
-              builder: (context, state) =>
-                  _placeholder("ProfileView"), //const ProfileView(),
+              builder: (context, state) => const ProfileView(),
               routes: [
                 GoRoute(
-                  path: 'personal-info',
-                  builder: (context, state) => _placeholder(
-                    "PersonalInfoView",
-                  ), // const PersonalInfoView(),
+                  path: Routes.personalInfo,
+                  builder: (context, state) => const PersonalInfoView(),
                 ),
                 GoRoute(
-                  path: 'medical-info',
-                  builder: (context, state) => _placeholder(
-                    "MedicalInfoView",
-                  ), // const MedicalInfoView(),
+                  path: Routes.medicalInfo,
+                  builder: (context, state) => const MedicalInfoView(),
                 ),
                 GoRoute(
                   path: 'notification-settings',
