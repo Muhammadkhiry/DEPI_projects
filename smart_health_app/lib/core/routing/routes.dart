@@ -17,4 +17,5 @@ abstract class Routes {
   // Sub-routes under /profile
   static const String personalInfo = 'personalInfo';
   static const String medicalInfo = 'medicalInfo';
+  static const String notification = 'notification';
 }

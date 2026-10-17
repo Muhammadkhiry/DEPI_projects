@@ -85,7 +85,9 @@ class ProfileView extends StatelessWidget {
                   _buildProfileTile(
                     icon: Icons.notifications_none_outlined,
                     title: 'Notification Settings',
-                    onTap: () => context.push('/profile/notification-settings'),
+                    onTap: () => context.push(
+                      "${Routes.profile}/${Routes.notification}",
+                    ),
                   ),
                   _buildProfileTile(
                     icon: Icons.security_outlined,
