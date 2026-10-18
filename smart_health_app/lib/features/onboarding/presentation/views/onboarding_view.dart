@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_health_app/core/constants/app_assets.dart';
+import 'package:smart_health_app/core/routing/routes.dart';
+import 'package:smart_health_app/core/utils/cache_helper.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -51,14 +53,17 @@ class _OnboardingViewState extends State<OnboardingView> {
     ),
   ];
 
-  void _onNextPressed() {
+  void _onNextPressed() async {
     if (_currentIndex < _pages.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
-      context.go('/login');
+      await CacheHelper.saveData(key: 'isOnboardingSeen', value: true);
+      if (mounted) {
+        context.go(Routes.login);
+      }
     }
   }
 
