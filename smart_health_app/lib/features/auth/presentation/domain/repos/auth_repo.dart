@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:smart_health_app/core/errors/failures.dart';
+import 'package:smart_health_app/features/auth/presentation/data/models/user_model.dart';
 
 abstract class AuthRepo {
   Future<Either<Failure, void>> loginWithEmailAndPassword({
@@ -25,4 +26,16 @@ abstract class AuthRepo {
     required String bloodType,
     File? imageFile,
   });
+<<<<<<< HEAD
+  Future<Either<Failure, UserModel>> getUserData();
+  
+  Future<Either<Failure, void>> updateUserProfile({
+    String? name,
+    String? phone,
+    String? bloodType,
+    bool? isWillingToDonate,
+    File? imageFile,
+  });
+=======
+>>>>>>> 07828d0f7dc0fbc21c3396eb48e59def6316548e
 }

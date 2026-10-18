@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/services/service_locator.dart';
 import 'package:smart_health_app/core/utils/cache_helper.dart';
+import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_cubit.dart';
 import 'package:smart_health_app/features/auth/presentation/views/complete_profile_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/forgot_password_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/login_view.dart';
@@ -53,14 +56,25 @@ final GoRouter appRouter = GoRouter(
         currentLocation == Routes.resetSent ||
         currentLocation == Routes.verifyEmail;
 
+    final bool isGoingToCompleteProfile =
+        currentLocation == Routes.completeProfile;
+
+    // 1. لو ماشافش الـ Onboarding
     if (!isOnboardingSeen) {
       return isGoingToOnboarding ? null : Routes.onboarding;
     }
 
-    if (!isLoggedIn) {
-      return isGoingToAuth ? null : Routes.login;
+    // 2. لو بيحاول يروح لشاشة Complete Profile سيبه يدخلها بدون تحويل
+    if (isGoingToCompleteProfile) {
+      return null;
     }
 
+    // 3. لو مش مسجل دخول وبيحاول يدخل شاشة رئيسية
+    // if (!isLoggedIn) {
+    //   return isGoingToAuth ? null : Routes.login;
+    // }
+
+    // 4. لو مسجل دخول وبيحاول يروح لصفحات الـ Auth
     if (isGoingToAuth || isGoingToOnboarding) {
       return Routes.home;
     }
@@ -92,7 +106,10 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: Routes.completeProfile,
-      builder: (context, state) => const CompleteProfileView(),
+      builder: (context, state) => BlocProvider(
+        create: (context) => getIt<AuthCubit>(),
+        child: const CompleteProfileView(),
+      ),
     ),
 
     // 2. Main 5-Tab Shell Navigation
@@ -289,7 +306,10 @@ final GoRouter appRouter = GoRouter(
               routes: [
                 GoRoute(
                   path: Routes.personalInfo,
-                  builder: (context, state) => const PersonalInfoView(),
+                  builder: (context, state) => BlocProvider(
+                    create: (context) => getIt<AuthCubit>(),
+                    child: const PersonalInfoView(),
+                  ),
                 ),
                 GoRoute(
                   path: Routes.medicalInfo,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_health_app/features/auth/presentation/domain/repos/auth_repo.dart';
+
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
@@ -48,6 +49,57 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> completeProfile({
+<<<<<<< HEAD
+    required String name,
+    required String phoneNumber,
+    required String bloodType,
+    File? imageFile,
+  }) async {
+    emit(AuthLoading());
+    final result = await authRepo.completeProfile(
+      name: name,
+      phoneNumber: phoneNumber,
+      bloodType: bloodType,
+      imageFile: imageFile,
+    );
+    result.fold(
+      (failure) => emit(AuthFailure(failure.errMessage)),
+      (_) => emit(AuthSuccess()),
+    );
+  }
+
+  // 1. جلب بيانات المستخدم
+  Future<void> fetchUserData() async {
+    emit(AuthLoading());
+    final result = await authRepo.getUserData();
+    result.fold(
+      (failure) => emit(AuthFailure(failure.errMessage)),
+      (userModel) => emit(UserDataLoaded(userModel)),
+    );
+  }
+
+  // 2. تحديث البيانات الشخصية والطبية
+  Future<void> updateProfile({
+    String? name,
+    String? phone,
+    String? bloodType,
+    bool? isWillingToDonate,
+    File? imageFile,
+  }) async {
+    emit(AuthLoading());
+    final result = await authRepo.updateUserProfile(
+      name: name,
+      phone: phone,
+      bloodType: bloodType,
+      isWillingToDonate: isWillingToDonate,
+      imageFile: imageFile,
+    );
+    result.fold((failure) => emit(AuthFailure(failure.errMessage)), (_) {
+      emit(ProfileUpdatedSuccess());
+      fetchUserData(); // إعادة جلب البيانات المحدثة
+    });
+  }
+=======
   required String name,
   required String phoneNumber,
   required String bloodType,
@@ -65,4 +117,5 @@ class AuthCubit extends Cubit<AuthState> {
     (_) => emit(AuthSuccess()),
   );
 }
+>>>>>>> 07828d0f7dc0fbc21c3396eb48e59def6316548e
 }
