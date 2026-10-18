@@ -16,9 +16,9 @@ class AuthRepoImpl implements AuthRepo {
 
   AuthRepoImpl({
     required this.firebaseAuth,
-    required this.firestore,
     required this.firebaseStorage,
-  });
+    FirebaseFirestore? firestore,
+  }) : firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
   Future<Either<Failure, void>> loginWithEmailAndPassword({
@@ -53,8 +53,8 @@ class AuthRepoImpl implements AuthRepo {
       final user = credential.user;
       if (user != null) {
         await user.updateDisplayName(name);
+        await user.sendEmailVerification();
 
-        // إنشاء الـ User Document في Firestore
         final userModel = UserModel(
           uid: user.uid,
           email: email,
@@ -102,6 +102,46 @@ class AuthRepoImpl implements AuthRepo {
   }
 
   @override
+  Future<Either<Failure, void>> completeProfile({
+    required String name,
+    required String phoneNumber,
+    required String bloodType,
+    File? imageFile,
+  }) async {
+    try {
+      final user = firebaseAuth.currentUser;
+      if (user == null) {
+        return Left(ServerFailure('User is not authenticated.'));
+      }
+
+      String? imageUrl;
+
+      if (imageFile != null) {
+        final storageRef = firebaseStorage.ref().child(
+          'profile_images/${user.uid}.jpg',
+        );
+        await storageRef.putFile(imageFile);
+        imageUrl = await storageRef.getDownloadURL();
+      }
+
+      final updateData = {
+        'name': name,
+        'phoneNumber': phoneNumber,
+        'bloodType': bloodType,
+        'isProfileCompleted': true,
+        'profilePicUrl': ?imageUrl,
+      };
+
+      await firestore.collection('users').doc(user.uid).update(updateData);
+      await user.updateDisplayName(name);
+
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure('Failed to complete profile: ${e.toString()}'));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> updateUserProfile({
     String? name,
     String? phone,
@@ -122,6 +162,7 @@ class AuthRepoImpl implements AuthRepo {
         updatedData['isWillingToDonate'] = isWillingToDonate;
       }
 
+      // رفع الصورة الجديدة لو تم اختيارها
       if (imageFile != null) {
         final ref = firebaseStorage.ref().child('user_photos/$uid.jpg');
         await ref.putFile(imageFile);
@@ -149,9 +190,7 @@ class AuthRepoImpl implements AuthRepo {
         return Left(ServerFailure('User data not found'));
       }
 
-      final userModel = UserModel.fromFirestore(
-        doc.data()! as DocumentSnapshot<Map<String, dynamic>>,
-      );
+      final userModel = UserModel.fromFirestore(doc);
       return Right(userModel);
     } catch (e) {
       return Left(ServerFailure('Failed to fetch user data: ${e.toString()}'));

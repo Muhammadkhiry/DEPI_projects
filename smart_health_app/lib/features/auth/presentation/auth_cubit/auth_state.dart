@@ -13,7 +13,6 @@ class AuthFailure extends AuthState {
   AuthFailure(this.errMessage);
 }
 
-// في auth_state.dart
 class UserDataLoaded extends AuthState {
   final UserModel userModel;
   UserDataLoaded(this.userModel);

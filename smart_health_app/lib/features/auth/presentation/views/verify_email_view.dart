@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -118,7 +119,25 @@ class VerifyEmailView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: () => context.go(Routes.completeProfile),
+                  onPressed: () async {
+                    final user = FirebaseAuth.instance.currentUser;
+                    await user?.reload();
+
+                    // if (user != null && user.emailVerified) {
+                    //   if (context.mounted) {
+                    //   }
+                    if (context.mounted) {
+                      context.go(Routes.completeProfile);
+                    } // } else {
+                    //   if (context.mounted) {
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       const SnackBar(
+                    //         content: Text('Please verify your email first.'),
+                    //       ),
+                    //     );
+                    //   }
+                    // }
+                  },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -149,7 +168,25 @@ class VerifyEmailView extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  try {
+                    await FirebaseAuth.instance.currentUser
+                        ?.sendEmailVerification();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Verification email sent again!'),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${e.toString()}')),
+                      );
+                    }
+                  }
+                },
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
