@@ -9,7 +9,6 @@ import 'package:smart_health_app/features/auth/presentation/domain/repos/auth_re
 final getIt = GetIt.instance;
 
 void setupServiceLocator() {
-  // 1. External Services (Firebase)
   if (!getIt.isRegistered<FirebaseAuth>()) {
     getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   }
@@ -20,7 +19,6 @@ void setupServiceLocator() {
     getIt.registerLazySingleton<FirebaseStorage>(() => FirebaseStorage.instance);
   }
 
-  // 2. Repositories
   if (!getIt.isRegistered<AuthRepo>()) {
     getIt.registerLazySingleton<AuthRepo>(
       () => AuthRepoImpl(
@@ -31,7 +29,6 @@ void setupServiceLocator() {
     );
   }
 
-  // 3. Cubits / Blocs
   if (!getIt.isRegistered<AuthCubit>()) {
     getIt.registerFactory<AuthCubit>(() => AuthCubit(getIt<AuthRepo>()));
   }

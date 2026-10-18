@@ -12,6 +12,7 @@ class AuthFailure extends AuthState {
   final String errMessage;
   AuthFailure(this.errMessage);
 }
+
 class UserDataLoaded extends AuthState {
   final UserModel userModel;
   UserDataLoaded(this.userModel);

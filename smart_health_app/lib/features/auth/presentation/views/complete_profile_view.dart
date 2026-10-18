@@ -8,6 +8,7 @@ import 'package:smart_health_app/core/theme/app_colors.dart';
 import 'package:smart_health_app/core/theme/app_text_styles.dart';
 import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_cubit.dart';
 import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_state.dart';
+
 class CompleteProfileView extends StatefulWidget {
   const CompleteProfileView({super.key});
 
@@ -21,6 +22,9 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
   bool isWillingToDonate = true;
   File? _imageFile;
 
+  // Controllers للتحكم في الحقول الإضافية للاسم ورقم الهاتف
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _dobController = TextEditingController(
     text: '14 / 05 / 1996',
   );
@@ -35,6 +39,14 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
     'O+',
     'O-',
   ];
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _dobController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -192,7 +204,70 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                 ),
                 const SizedBox(height: 24),
 
-                // 5. Date of Birth
+                // 5. Full Name Field (تم إضافته لربطه بالبيانات الحقيقية)
+                Text(
+                  'Full Name',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your full name',
+                    filled: true,
+                    fillColor: AppColors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.primary),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // 6. Phone Number Field (تم إضافته لربطه بالبيانات الحقيقية)
+                Text(
+                  'Phone Number',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your phone number',
+                    filled: true,
+                    fillColor: AppColors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.primary),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // 7. Date of Birth
                 Text(
                   'Date of Birth',
                   style: AppTextStyles.bodyMedium.copyWith(
@@ -236,7 +311,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                 ),
                 const SizedBox(height: 20),
 
-                // 6. Biological Sex Selector
+                // 8. Biological Sex Selector
                 Text(
                   'Biological Sex',
                   style: AppTextStyles.bodyMedium.copyWith(
@@ -331,7 +406,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                 ),
                 const SizedBox(height: 20),
 
-                // 7. Blood Type Grid
+                // 9. Blood Type Grid
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -410,7 +485,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                 ),
                 const SizedBox(height: 20),
 
-                // 8. Donation Willingness Toggle Card
+                // 10. Donation Willingness Toggle Card
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -465,7 +540,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                 ),
                 const SizedBox(height: 28),
 
-                // 9. Finish Button
+                // 11. Finish Button
                 BlocBuilder<AuthCubit, AuthState>(
                   builder: (context, state) {
                     if (state is AuthLoading) {
@@ -483,9 +558,12 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                           ),
                         ),
                         onPressed: () {
+                          // استدعاء completeProfile بالبيانات الفعلية من حقول الإدخال
                           context.read<AuthCubit>().completeProfile(
-                                name: 'User Name',
-                                phoneNumber: '',
+                                name: _nameController.text.trim().isNotEmpty
+                                    ? _nameController.text.trim()
+                                    : 'User',
+                                phoneNumber: _phoneController.text.trim(),
                                 bloodType: selectedBloodType,
                                 imageFile: _imageFile,
                               );
@@ -508,7 +586,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                 ),
                 const SizedBox(height: 16),
 
-                // 10. Skip for now Link
+                // 12. Skip for now Link
                 Center(
                   child: GestureDetector(
                     onTap: () => context.go(Routes.home),
@@ -524,7 +602,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                 ),
                 const SizedBox(height: 24),
 
-                // 11. Footer Notice
+                // 13. Footer Notice
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

@@ -26,7 +26,7 @@ abstract class AuthRepo {
     required String bloodType,
     File? imageFile,
   });
-<<<<<<< HEAD
+
   Future<Either<Failure, UserModel>> getUserData();
   
   Future<Either<Failure, void>> updateUserProfile({
@@ -36,6 +36,4 @@ abstract class AuthRepo {
     bool? isWillingToDonate,
     File? imageFile,
   });
-=======
->>>>>>> 07828d0f7dc0fbc21c3396eb48e59def6316548e
 }

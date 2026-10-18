@@ -54,9 +54,7 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
-            ),
+            colorScheme: const ColorScheme.light(primary: AppColors.primary),
           ),
           child: child!,
         );
@@ -78,9 +76,8 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
         listener: (context, state) {
           if (state is UserDataLoaded) {
             _fullNameController.text = state.userModel.name ?? '';
-            _emailController.text = state.userModel.email ;
+            _emailController.text = state.userModel.email;
             _phoneController.text = state.userModel.phoneNumber ?? '';
-            // لو البيانات فيها تاريخ ميلاد أو نوع بنملأهم
           } else if (state is ProfileUpdatedSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -102,7 +99,10 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
 
           return SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 12.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -137,7 +137,11 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                       const CircleAvatar(
                         radius: 16,
                         backgroundColor: AppColors.primary,
-                        child: Icon(Icons.person, size: 20, color: AppColors.white),
+                        child: Icon(
+                          Icons.person,
+                          size: 20,
+                          color: AppColors.white,
+                        ),
                       ),
                     ],
                   ),
@@ -154,7 +158,9 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                               backgroundColor: AppColors.primary,
                               child: Text(
                                 _fullNameController.text.isNotEmpty
-                                    ? _fullNameController.text.substring(0, 1).toUpperCase()
+                                    ? _fullNameController.text
+                                          .substring(0, 1)
+                                          .toUpperCase()
                                     : 'MK',
                                 style: AppTextStyles.headlineLarge.copyWith(
                                   color: AppColors.white,
@@ -186,9 +192,7 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                         ),
                         const SizedBox(height: 10),
                         GestureDetector(
-                          onTap: () {
-                            // إمكانية اختيار صورة لاحقاً
-                          },
+                          onTap: () {},
                           child: const Text(
                             'Change photo',
                             style: TextStyle(
@@ -374,7 +378,9 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                           children: [
                             Container(
                               height: 48,
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.neutralBg,
                                 borderRadius: BorderRadius.circular(10),
@@ -385,7 +391,9 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                                   SizedBox(width: 4),
                                   Text(
                                     '+20',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   Icon(
                                     Icons.keyboard_arrow_down,
@@ -487,19 +495,22 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 3.2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                          ),
+                                crossAxisCount: 2,
+                                childAspectRatio: 3.2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                              ),
                           itemCount: genderOptions.length,
                           itemBuilder: (context, index) {
                             final gender = genderOptions[index];
                             final isSelected = selectedGender == gender;
                             return GestureDetector(
-                              onTap: () => setState(() => selectedGender = gender),
+                              onTap: () =>
+                                  setState(() => selectedGender = gender),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? AppColors.primary
@@ -507,7 +518,8 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       gender,
@@ -603,9 +615,9 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                           ? null
                           : () {
                               context.read<AuthCubit>().updateProfile(
-                                    name: _fullNameController.text.trim(),
-                                    phone: _phoneController.text.trim(),
-                                  );
+                                name: _fullNameController.text.trim(),
+                                phone: _phoneController.text.trim(),
+                              );
                             },
                       child: isLoading
                           ? const CircularProgressIndicator(color: Colors.white)

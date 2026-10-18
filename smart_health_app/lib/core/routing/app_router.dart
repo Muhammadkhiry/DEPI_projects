@@ -44,6 +44,7 @@ final GoRouter appRouter = GoRouter(
   initialLocation: Routes.onboarding,
   redirect: (context, state) {
     final bool isOnboardingSeen = CacheHelper.getBool(key: 'isOnboardingSeen');
+    // ignore: unused_local_variable
     final bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
 
     final String currentLocation = state.matchedLocation;
@@ -313,7 +314,10 @@ final GoRouter appRouter = GoRouter(
                 ),
                 GoRoute(
                   path: Routes.medicalInfo,
-                  builder: (context, state) => const MedicalInfoView(),
+                  builder: (context, state) => BlocProvider(
+                    create: (context) => getIt<AuthCubit>(),
+                    child: const MedicalInfoView(),
+                  ),
                 ),
                 GoRoute(
                   path: Routes.notificationSettings,

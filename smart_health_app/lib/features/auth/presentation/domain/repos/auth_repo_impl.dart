@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:smart_health_app/core/errors/failures.dart';
 import 'package:smart_health_app/features/auth/presentation/data/models/user_model.dart';
 
@@ -12,18 +12,13 @@ import '../../domain/repos/auth_repo.dart';
 class AuthRepoImpl implements AuthRepo {
   final FirebaseAuth firebaseAuth;
   final FirebaseFirestore firestore;
-<<<<<<< HEAD
   final FirebaseStorage firebaseStorage;
+
   AuthRepoImpl({
-    required this.firebaseStorage,
     required this.firebaseAuth,
+    required this.firebaseStorage,
     FirebaseFirestore? firestore,
   }) : firestore = firestore ?? FirebaseFirestore.instance;
-=======
-
-  AuthRepoImpl({required this.firebaseAuth, FirebaseFirestore? firestore})
-    : firestore = firestore ?? FirebaseFirestore.instance;
->>>>>>> 07828d0f7dc0fbc21c3396eb48e59def6316548e
 
   @override
   Future<Either<Failure, void>> loginWithEmailAndPassword({
@@ -44,7 +39,6 @@ class AuthRepoImpl implements AuthRepo {
   }
 
   @override
-  @override
   Future<Either<Failure, void>> signUpWithEmailAndPassword({
     required String email,
     required String password,
@@ -59,7 +53,6 @@ class AuthRepoImpl implements AuthRepo {
       final user = credential.user;
       if (user != null) {
         await user.updateDisplayName(name);
-
         await user.sendEmailVerification();
 
         final userModel = UserModel(
@@ -124,7 +117,7 @@ class AuthRepoImpl implements AuthRepo {
       String? imageUrl;
 
       if (imageFile != null) {
-        final storageRef = FirebaseStorage.instance.ref().child(
+        final storageRef = firebaseStorage.ref().child(
           'profile_images/${user.uid}.jpg',
         );
         await storageRef.putFile(imageFile);
@@ -140,7 +133,6 @@ class AuthRepoImpl implements AuthRepo {
       };
 
       await firestore.collection('users').doc(user.uid).update(updateData);
-
       await user.updateDisplayName(name);
 
       return const Right(null);
@@ -148,7 +140,6 @@ class AuthRepoImpl implements AuthRepo {
       return Left(ServerFailure('Failed to complete profile: ${e.toString()}'));
     }
   }
-<<<<<<< HEAD
 
   @override
   Future<Either<Failure, void>> updateUserProfile({
@@ -199,14 +190,10 @@ class AuthRepoImpl implements AuthRepo {
         return Left(ServerFailure('User data not found'));
       }
 
-      final userModel = UserModel.fromFirestore(
-        doc.data()! as DocumentSnapshot<Map<String, dynamic>>,
-      );
+      final userModel = UserModel.fromFirestore(doc);
       return Right(userModel);
     } catch (e) {
       return Left(ServerFailure('Failed to fetch user data: ${e.toString()}'));
     }
   }
-=======
->>>>>>> 07828d0f7dc0fbc21c3396eb48e59def6316548e
 }
