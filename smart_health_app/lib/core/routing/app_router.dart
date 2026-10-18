@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/utils/cache_helper.dart';
 import 'package:smart_health_app/features/auth/presentation/views/complete_profile_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/forgot_password_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/login_view.dart';
@@ -37,6 +39,34 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: Routes.onboarding,
+  redirect: (context, state) {
+    final bool isOnboardingSeen = CacheHelper.getBool(key: 'isOnboardingSeen');
+    final bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
+
+    final String currentLocation = state.matchedLocation;
+
+    final bool isGoingToOnboarding = currentLocation == Routes.onboarding;
+    final bool isGoingToAuth =
+        currentLocation == Routes.login ||
+        currentLocation == Routes.signUp ||
+        currentLocation == Routes.forgotPassword ||
+        currentLocation == Routes.resetSent ||
+        currentLocation == Routes.verifyEmail;
+
+    if (!isOnboardingSeen) {
+      return isGoingToOnboarding ? null : Routes.onboarding;
+    }
+
+    if (!isLoggedIn) {
+      return isGoingToAuth ? null : Routes.login;
+    }
+
+    if (isGoingToAuth || isGoingToOnboarding) {
+      return Routes.home;
+    }
+
+    return null;
+  },
   routes: [
     // 1. Auth & Onboarding Flow
     GoRoute(
