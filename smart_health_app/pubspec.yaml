@@ -31,6 +31,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   firebase_auth: ^7.0.0
+  firebase_core: ^5.0.0
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1

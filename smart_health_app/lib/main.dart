@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:smart_health_app/core/services/service_locator.dart';
+import 'package:smart_health_app/core/routing/app_router.dart';
+import 'package:smart_health_app/core/theme/app_colors.dart';
+import 'core/services/service_locator.dart';
+import 'firebase_options.dart';  
+import 'package:firebase_core/firebase_core.dart';
 
-import 'core/routing/app_router.dart';
-import 'core/theme/app_colors.dart';
-
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   setupServiceLocator();
   runApp(const SmartHealthApp());
 }

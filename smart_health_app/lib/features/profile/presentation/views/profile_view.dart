@@ -460,11 +460,10 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(height: 20),
 
               // 7. Log Out Button
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(16),
-                ),
+              Material(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                clipBehavior: Clip.antiAlias,
                 child: ListTile(
                   leading: Container(
                     padding: const EdgeInsets.all(8),
