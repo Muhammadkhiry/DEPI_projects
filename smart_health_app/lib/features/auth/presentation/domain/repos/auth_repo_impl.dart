@@ -12,12 +12,18 @@ import '../../domain/repos/auth_repo.dart';
 class AuthRepoImpl implements AuthRepo {
   final FirebaseAuth firebaseAuth;
   final FirebaseFirestore firestore;
+<<<<<<< HEAD
   final FirebaseStorage firebaseStorage;
   AuthRepoImpl({
     required this.firebaseStorage,
     required this.firebaseAuth,
     FirebaseFirestore? firestore,
   }) : firestore = firestore ?? FirebaseFirestore.instance;
+=======
+
+  AuthRepoImpl({required this.firebaseAuth, FirebaseFirestore? firestore})
+    : firestore = firestore ?? FirebaseFirestore.instance;
+>>>>>>> 07828d0f7dc0fbc21c3396eb48e59def6316548e
 
   @override
   Future<Either<Failure, void>> loginWithEmailAndPassword({
@@ -142,6 +148,7 @@ class AuthRepoImpl implements AuthRepo {
       return Left(ServerFailure('Failed to complete profile: ${e.toString()}'));
     }
   }
+<<<<<<< HEAD
 
   @override
   Future<Either<Failure, void>> updateUserProfile({
@@ -200,4 +207,6 @@ class AuthRepoImpl implements AuthRepo {
       return Left(ServerFailure('Failed to fetch user data: ${e.toString()}'));
     }
   }
+=======
+>>>>>>> 07828d0f7dc0fbc21c3396eb48e59def6316548e
 }

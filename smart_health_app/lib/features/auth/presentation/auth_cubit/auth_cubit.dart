@@ -49,6 +49,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> completeProfile({
+<<<<<<< HEAD
     required String name,
     required String phoneNumber,
     required String bloodType,
@@ -98,4 +99,23 @@ class AuthCubit extends Cubit<AuthState> {
       fetchUserData(); // إعادة جلب البيانات المحدثة
     });
   }
+=======
+  required String name,
+  required String phoneNumber,
+  required String bloodType,
+  File? imageFile,
+}) async {
+  emit(AuthLoading());
+  final result = await authRepo.completeProfile(
+    name: name,
+    phoneNumber: phoneNumber,
+    bloodType: bloodType,
+    imageFile: imageFile,
+  );
+  result.fold(
+    (failure) => emit(AuthFailure(failure.errMessage)),
+    (_) => emit(AuthSuccess()),
+  );
+}
+>>>>>>> 07828d0f7dc0fbc21c3396eb48e59def6316548e
 }
