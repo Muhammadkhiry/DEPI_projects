@@ -427,7 +427,7 @@ class _ProfileViewState extends State<ProfileView> {
                       title: 'Notification settings',
                       subtitle: 'Urgent SMS, push alerts',
                       onTap: () => context.push(
-                        "${Routes.profile}/${Routes.notification}",
+                        "${Routes.profile}/${Routes.notificationSettings}",
                       ),
                     ),
                     const Divider(

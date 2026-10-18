@@ -6,11 +6,11 @@ import 'package:smart_health_app/features/auth/presentation/views/login_view.dar
 import 'package:smart_health_app/features/auth/presentation/views/reset_sent_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/signup_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/verify_email_view.dart';
-import 'package:smart_health_app/features/home/presentation/views/notifications_view.dart';
 import 'package:smart_health_app/features/onboarding/presentation/views/onboarding_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/account_privacy_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/help_center_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/medical_info_view.dart';
+import 'package:smart_health_app/features/profile/presentation/views/notification_settings_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/personal_info_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/profile_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/terms_conditions_view.dart';
@@ -266,7 +266,7 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const MedicalInfoView(),
                 ),
                 GoRoute(
-                  path: Routes.notification,
+                  path: Routes.notificationSettings,
                   builder: (context, state) => const NotificationSettingsView(),
                 ), // const NotificationSettingsView(),
                 GoRoute(
