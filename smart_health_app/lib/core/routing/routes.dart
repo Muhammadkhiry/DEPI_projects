@@ -19,4 +19,6 @@ abstract class Routes {
   static const String medicalInfo = 'medicalInfo';
   static const String notification = 'notification';
   static const String accountPrivacy = 'accountPrivacy';
+  static const String helpCenter = 'helpCenter';
+  static const String termsConditions = 'termsConditions';
 }

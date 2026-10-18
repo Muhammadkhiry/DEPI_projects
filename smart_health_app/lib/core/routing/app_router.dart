@@ -9,9 +9,11 @@ import 'package:smart_health_app/features/auth/presentation/views/verify_email_v
 import 'package:smart_health_app/features/home/presentation/views/notifications_view.dart';
 import 'package:smart_health_app/features/onboarding/presentation/views/onboarding_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/account_privacy_view.dart';
+import 'package:smart_health_app/features/profile/presentation/views/help_center_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/medical_info_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/personal_info_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/profile_view.dart';
+import 'package:smart_health_app/features/profile/presentation/views/terms_conditions_view.dart';
 
 import '../theme/app_colors.dart';
 import 'routes.dart';
@@ -273,12 +275,11 @@ final GoRouter appRouter = GoRouter(
                 ),
                 GoRoute(
                   path: 'help-center',
-                  builder: (context, state) => _placeholder('Help Center'),
+                  builder: (context, state) => const HelpCenterView(),
                 ),
                 GoRoute(
                   path: 'terms-conditions',
-                  builder: (context, state) =>
-                      _placeholder('Terms & Conditions'),
+                  builder: (context, state) => const TermsConditionsView(),
                 ),
               ],
             ),

@@ -99,7 +99,8 @@ class ProfileView extends StatelessWidget {
                   _buildProfileTile(
                     icon: Icons.help_outline,
                     title: 'Help & Support',
-                    onTap: () => context.push('/profile/help-center'),
+                    onTap: () =>
+                        context.push("${Routes.profile}/${Routes.helpCenter}"),
                   ),
                   _buildProfileTile(
                     icon: Icons.logout,
