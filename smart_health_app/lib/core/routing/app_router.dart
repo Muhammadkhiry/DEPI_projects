@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/services/service_locator.dart';
+import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_cubit.dart';
 import 'package:smart_health_app/features/auth/presentation/views/complete_profile_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/forgot_password_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/login_view.dart';
@@ -259,11 +262,17 @@ final GoRouter appRouter = GoRouter(
               routes: [
                 GoRoute(
                   path: Routes.personalInfo,
-                  builder: (context, state) => const PersonalInfoView(),
+                  builder: (context, state) => BlocProvider(
+                    create: (context) => getIt<AuthCubit>(),
+                    child: const PersonalInfoView(),
+                  ),
                 ),
                 GoRoute(
                   path: Routes.medicalInfo,
-                  builder: (context, state) => const MedicalInfoView(),
+                  builder: (context, state) => BlocProvider(
+                    create: (context) => getIt<AuthCubit>(),
+                    child: const MedicalInfoView(),
+                  ),
                 ),
                 GoRoute(
                   path: Routes.notificationSettings,
