@@ -274,11 +274,11 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const AccountPrivacyView(),
                 ),
                 GoRoute(
-                  path: 'help-center',
+                  path: Routes.helpCenter,
                   builder: (context, state) => const HelpCenterView(),
                 ),
                 GoRoute(
-                  path: 'terms-conditions',
+                  path: Routes.termsConditions,
                   builder: (context, state) => const TermsConditionsView(),
                 ),
               ],
