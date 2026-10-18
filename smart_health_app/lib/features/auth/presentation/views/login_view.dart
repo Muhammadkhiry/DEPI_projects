@@ -70,18 +70,6 @@ class _LoginViewState extends State<LoginView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Back Button
-                      IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: AppColors.textDark,
-                        ),
-                        onPressed: () {
-                          if (context.canPop()) context.pop();
-                        },
-                      ),
                       const SizedBox(height: 20),
 
                       // Smart Health Badge

@@ -1,12 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smart_health_app/core/errors/failures.dart';
+import 'package:smart_health_app/features/auth/presentation/data/models/user_model.dart';
 import '../../domain/repos/auth_repo.dart';
 
 class AuthRepoImpl implements AuthRepo {
   final FirebaseAuth firebaseAuth;
+  final FirebaseFirestore firestore;
 
-  AuthRepoImpl({required this.firebaseAuth});
+  AuthRepoImpl({
+    required this.firebaseAuth,
+    FirebaseFirestore? firestore,
+  }) : firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
   Future<Either<Failure, void>> loginWithEmailAndPassword({
@@ -37,7 +43,26 @@ class AuthRepoImpl implements AuthRepo {
         email: email,
         password: password,
       );
-      await credential.user?.updateDisplayName(name);
+      
+      final user = credential.user;
+      if (user != null) {
+        await user.updateDisplayName(name);
+
+        // إنشاء الـ User Document في Firestore
+        final userModel = UserModel(
+          uid: user.uid,
+          email: email,
+          name: name,
+          isProfileCompleted: false,
+          createdAt: DateTime.now(),
+        );
+
+        await firestore
+            .collection('users')
+            .doc(user.uid)
+            .set(userModel.toFirestore(), SetOptions(merge: true));
+      }
+
       return const Right(null);
     } on FirebaseAuthException catch (e) {
       return Left(ServerFailure.fromFirebaseAuth(e.code));
