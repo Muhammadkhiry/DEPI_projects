@@ -8,7 +8,6 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setupServiceLocator(); 
   runApp(const SmartHealthApp());
-  runApp(const SmartHealthApp());
 }
 
 class SmartHealthApp extends StatelessWidget {
