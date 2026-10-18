@@ -6,7 +6,7 @@ import 'core/theme/app_colors.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  setupServiceLocator(); 
+  setupServiceLocator();
   runApp(const SmartHealthApp());
 }
 
