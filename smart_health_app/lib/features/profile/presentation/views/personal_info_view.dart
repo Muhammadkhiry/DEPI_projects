@@ -31,6 +31,7 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
     _phoneController = TextEditingController();
     _dobController = TextEditingController();
 
+    // جلب بيانات المستخدم الحالية فور فتح الشاشة
     context.read<AuthCubit>().fetchUserData();
   }
 
@@ -191,9 +192,7 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                         ),
                         const SizedBox(height: 10),
                         GestureDetector(
-                          onTap: () {
-                            // إمكانية اختيار صورة لاحقاً
-                          },
+                          onTap: () {},
                           child: const Text(
                             'Change photo',
                             style: TextStyle(

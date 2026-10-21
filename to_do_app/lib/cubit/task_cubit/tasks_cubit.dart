@@ -1,75 +1,60 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:to_do_app/cubit/task_cubit/tasks_states.dart';
-import 'package:to_do_app/models/task_model.dart';
+import '../../models/task_model.dart';
+import 'tasks_states.dart';
 
 class TasksCubit extends Cubit<TasksStates> {
-  TasksCubit() : super(TasksInitial());
+  TasksCubit() : super(TasksInitialState());
 
+  static const String tasksBoxName = 'tasks_box';
   List<TaskModel> tasks = [];
-  List<TaskModel> completedTasks = [];
-  Box<TaskModel>? _tasksBox;
 
-  Future<void> initHive() async {
-    _tasksBox = Hive.box<TaskModel>('tasksBox');
-    loadTasks();
-  }
-
-  void loadTasks() {
-    emit(TasksLoading());
-    if (_tasksBox != null) {
-      final allStored = _tasksBox!.values.toList();
-      tasks = allStored.where((t) => !t.isDone).toList();
-      completedTasks = allStored.where((t) => t.isDone).toList();
-    }
-    _emitSuccess();
-  }
-
-  void displayTasks() {
-    loadTasks();
-  }
-
-  void addTask({required String title, required String date}) {
-    if (title.trim().isNotEmpty && date.trim().isNotEmpty) {
-      String generatedId = DateTime.now().millisecondsSinceEpoch.toString();
-      TaskModel newTask = TaskModel(id: generatedId, title: title, date: date);
-
-      tasks.add(newTask);
-      _tasksBox?.put(generatedId, newTask);
-      _emitSuccess();
-    } else {
-      emit(TasksError(message: "Title or Date cannot be empty"));
+  // جلب كافة المهام
+  void getTasks() async {
+    try {
+      var box = Hive.box<TaskModel>(tasksBoxName);
+      tasks = box.values.toList();
+      emit(TasksSuccessState(tasks: tasks));
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
     }
   }
 
-  void toggleTaskStatus(TaskModel task) {
-    task.isDone = !task.isDone;
-    task.save(); // Updates Hive directly
+  // Getter للمهام المكتملة
+  List<TaskModel> get completedTasks {
+    return tasks.where((task) => task.isCompleted).toList();
+  }
 
-    if (task.isDone) {
-      tasks.removeWhere((t) => t.id == task.id);
-      completedTasks.add(task);
-    } else {
-      completedTasks.removeWhere((t) => t.id == task.id);
-      tasks.add(task);
+  // إضافة مهمة جديدة
+  Future<void> addTask(TaskModel task) async {
+    emit(TasksLoadingState());
+    try {
+      var box = Hive.box<TaskModel>(tasksBoxName);
+      await box.add(task);
+      getTasks();
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
     }
-    _emitSuccess();
   }
 
-  void deleteTask(String id) {
-    tasks.removeWhere((task) => task.id == id);
-    completedTasks.removeWhere((task) => task.id == id);
-    _tasksBox?.delete(id);
-
-    _emitSuccess();
+  // تغيير حالة المهمة (مكتملة / غير مكتملة)
+  Future<void> toggleTaskStatus(TaskModel task) async {
+    try {
+      task.isCompleted = !task.isCompleted;
+      await task.save(); // حفظ التعديل في Hive
+      getTasks();
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
+    }
   }
 
-  void _emitSuccess() {
-    emit(
-      TasksSuccess(
-        tasks: List.from(tasks),
-        completedTasks: List.from(completedTasks),
-      ),
-    );
+  // حذف مهمة
+  Future<void> deleteTask(TaskModel task) async {
+    try {
+      await task.delete(); // حذف من Hive
+      getTasks();
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
+    }
   }
 }

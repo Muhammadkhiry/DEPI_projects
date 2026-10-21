@@ -1,45 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:to_do_app/cubit/user_cubit/user_cubit.dart';
+import '../cubit/user_cubit/user_cubit.dart';
+import '../cubit/user_cubit/user_states.dart';
+import '../views/log_in_view.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final userCubit = BlocProvider.of<UserCubit>(context);
-
     return Drawer(
+      backgroundColor: const Color(0xffF8F9FA),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          UserAccountsDrawerHeader(
-            decoration: BoxDecoration(color: Color(0xff03A0A7)),
-            accountName: Text(
-              userCubit.userName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            accountEmail: const Text("Protected To-Do Account"),
-            currentAccountPicture: const CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.person, size: 40, color: Color(0xFF00B4D8)),
-            ),
+          BlocBuilder<UserCubit, UserStates>(
+            builder: (context, state) {
+              final userName = context.watch<UserCubit>().userName;
+              return UserAccountsDrawerHeader(
+                decoration: const BoxDecoration(
+                  color: Color(0xff00A896), // الهيدر باللون الأساسي
+                ),
+                accountName: Text(
+                  userName.isEmpty ? "User" : userName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                accountEmail: const Text(
+                  "Local Storage Account",
+                  style: TextStyle(color: Colors.white70),
+                ),
+                currentAccountPicture: const CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.person, size: 40, color: Color(0xff00A896)),
+                ),
+              );
+            },
           ),
           ListTile(
-            leading: const Icon(Icons.edit_outlined),
+            leading: const Icon(Icons.edit_outlined, color: Color(0xff00A896)),
             title: const Text("Edit Profile"),
             onTap: () {
               Navigator.pop(context);
               _showEditProfileDialog(context);
             },
           ),
-          const Divider(),
+          const Divider(indent: 16, endIndent: 16),
           ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text("Logout", style: TextStyle(color: Colors.red)),
-            onTap: () {
+            leading: const Icon(Icons.logout, color: Colors.redAccent),
+            title: const Text(
+              "Logout",
+              style: TextStyle(color: Colors.redAccent),
+            ),
+            onTap: () async {
               Navigator.pop(context);
-              userCubit.logout();
+              await context.read<UserCubit>().logout();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LogInView()),
+                  (route) => false,
+                );
+              }
             },
           ),
         ],
@@ -47,43 +72,48 @@ class CustomDrawer extends StatelessWidget {
     );
   }
 
-  void _showEditProfileDialog(BuildContext context) {
-    final nameController = TextEditingController();
-    final passController = TextEditingController();
+  void _showEditProfileDialog(BuildContext parentContext) {
+    final userCubit = parentContext.read<UserCubit>();
+    final nameController = TextEditingController(text: userCubit.userName);
 
     showDialog(
-      context: context,
-      builder: (context) {
+      context: parentContext,
+      builder: (dialogContext) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text("Update Profile"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: "New Name"),
+          content: TextField(
+            controller: nameController,
+            decoration: InputDecoration(
+              labelText: "New Name",
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Color(0xff00A896)),
               ),
-              TextField(
-                controller: passController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: "New Password"),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
-            ],
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
-              onPressed: () {
-                BlocProvider.of<UserCubit>(context).updateUserProfile(
-                  newName: nameController.text,
-                  newPassword: passController.text,
-                );
-                Navigator.pop(context);
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xff00A896),
+              ),
+              onPressed: () async {
+                final newName = nameController.text.trim();
+                if (newName.isNotEmpty) {
+                  await userCubit.saveUserProfile(newName);
+                }
+                if (dialogContext.mounted) {
+                  Navigator.pop(dialogContext);
+                }
               },
-              child: const Text("Save"),
+              child: const Text("Save", style: TextStyle(color: Colors.white)),
             ),
           ],
         );

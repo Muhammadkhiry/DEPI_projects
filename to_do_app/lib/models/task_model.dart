@@ -14,26 +14,12 @@ class TaskModel extends HiveObject {
   final String date;
 
   @HiveField(3)
-  bool isDone;
+  bool isCompleted;
 
   TaskModel({
     required this.id,
     required this.title,
     required this.date,
-    this.isDone = false,
+    this.isCompleted = false,
   });
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'date': date,
-        'isDone': isDone,
-      };
-
-  factory TaskModel.fromJson(Map<String, dynamic> json) => TaskModel(
-        id: json['id'],
-        title: json['title'],
-        date: json['date'],
-        isDone: json['isDone'] ?? false,
-      );
 }
