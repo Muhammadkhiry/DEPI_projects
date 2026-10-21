@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:to_do_app/cubit/task_cubit/tasks_cubit.dart';
-import 'package:to_do_app/cubit/task_cubit/tasks_states.dart';
-import 'package:to_do_app/widgets/no_tasks_widget.dart';
-import 'package:to_do_app/widgets/task_builder.dart';
+import '../cubit/task_cubit/tasks_cubit.dart';
+import '../cubit/task_cubit/tasks_states.dart';
+import '../widgets/task_builder.dart';
 
 class CompletedTasksView extends StatelessWidget {
   const CompletedTasksView({super.key});
@@ -13,20 +12,22 @@ class CompletedTasksView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Completed Tasks"),
-        backgroundColor: const Color(0xFF00B4D8),
+        backgroundColor: const Color(0xff03A0A7),
       ),
       body: BlocBuilder<TasksCubit, TasksStates>(
         builder: (context, state) {
-          final completed = BlocProvider.of<TasksCubit>(context).completedTasks;
-          if (completed.isEmpty) {
-            return const NoTasksWidget();
+          final completedTasks = context.watch<TasksCubit>().completedTasks;
+
+          if (completedTasks.isEmpty) {
+            return const Center(
+              child: Text(
+                "No completed tasks yet!",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            );
           }
-          return ListView.builder(
-            itemCount: completed.length,
-            itemBuilder: (context, index) {
-              return TaskBuilder(taskModel: completed[index]);
-            },
-          );
+
+          return TaskBuilder(tasks: completedTasks);
         },
       ),
     );

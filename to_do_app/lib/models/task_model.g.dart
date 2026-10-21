@@ -20,7 +20,7 @@ class TaskModelAdapter extends TypeAdapter<TaskModel> {
       id: fields[0] as String,
       title: fields[1] as String,
       date: fields[2] as String,
-      isDone: fields[3] as bool,
+      isCompleted: fields[3] as bool,
     );
   }
 
@@ -35,7 +35,7 @@ class TaskModelAdapter extends TypeAdapter<TaskModel> {
       ..writeByte(2)
       ..write(obj.date)
       ..writeByte(3)
-      ..write(obj.isDone);
+      ..write(obj.isCompleted);
   }
 
   @override

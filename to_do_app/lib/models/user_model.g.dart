@@ -18,7 +18,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
     };
     return UserModel(
       name: fields[0] as String,
-      password: fields[1] as String,
+      profileImage: fields[1] as String?,
     );
   }
 
@@ -29,7 +29,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.password);
+      ..write(obj.profileImage);
   }
 
   @override
