@@ -26,6 +26,44 @@ class _HomeViewState extends State<HomeView> {
     BlocProvider.of<TasksCubit>(context).getTasks();
   }
 
+  void _showTodayReminders(BuildContext context) {
+    final pending = context.read<TasksCubit>().todayPending;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Today's Reminders",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            if (pending.isEmpty)
+              const Text(
+                "You're all caught up for today!",
+                style: TextStyle(color: Colors.grey),
+              )
+            else
+              ...pending.map(
+                (t) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.radio_button_unchecked,
+                      color: Color(0xff00A896)),
+                  title: Text(t.title),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final todayDate = DateFormat('MMM dd, yyyy').format(DateTime.now());
@@ -40,7 +78,7 @@ class _HomeViewState extends State<HomeView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none, color: Colors.black87),
-            onPressed: () {},
+            onPressed: () => _showTodayReminders(context),
           ),
         ],
       ),
@@ -79,8 +117,10 @@ class _HomeViewState extends State<HomeView> {
             BlocBuilder<TasksCubit, TasksStates>(
               builder: (context, state) {
                 final tasksCubit = context.watch<TasksCubit>();
-                final total = tasksCubit.tasks.length;
-                final completed = tasksCubit.completedTasks.length;
+                final todayTasks = tasksCubit.todayTasks;
+                final total = todayTasks.length;
+                final completed =
+                    todayTasks.where((t) => t.isCompleted).length;
                 final double progress = total == 0 ? 0 : completed / total;
 
                 return Container(

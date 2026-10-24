@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/task_cubit/tasks_cubit.dart';
 import '../cubit/user_cubit/user_cubit.dart';
 import '../cubit/user_cubit/user_states.dart';
 import '../views/log_in_view.dart';
@@ -57,6 +58,8 @@ class CustomDrawer extends StatelessWidget {
             ),
             onTap: () async {
               Navigator.pop(context);
+              await context.read<TasksCubit>().clearTasks();
+              if (!context.mounted) return;
               await context.read<UserCubit>().logout();
               if (context.mounted) {
                 Navigator.pushAndRemoveUntil(

@@ -8,10 +8,10 @@ class TaskModel extends HiveObject {
   final String id;
 
   @HiveField(1)
-  final String title;
+  String title;
 
   @HiveField(2)
-  final String date;
+  String date;
 
   @HiveField(3)
   bool isCompleted;

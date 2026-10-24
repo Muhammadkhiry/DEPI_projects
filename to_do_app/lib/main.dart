@@ -45,7 +45,7 @@ class ToDoApp extends StatelessWidget {
         title: 'To Do App',
         theme: ThemeData(
           useMaterial3: true,
-          colorSchemeSeed: const Color(0xff03A0A7),
+          colorSchemeSeed: const Color(0xff00A896),
         ),
         home: isLoggedIn ? const HomeView() : const LogInView(),
       ),

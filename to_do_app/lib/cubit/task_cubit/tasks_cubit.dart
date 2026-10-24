@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 import '../../models/task_model.dart';
 import 'tasks_states.dart';
 
@@ -24,6 +25,16 @@ class TasksCubit extends Cubit<TasksStates> {
   List<TaskModel> get completedTasks {
     return tasks.where((task) => task.isCompleted).toList();
   }
+
+  String get _today => DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  // مهام النهارده
+  List<TaskModel> get todayTasks =>
+      tasks.where((task) => task.date == _today).toList();
+
+  // مهام النهارده غير المكتملة
+  List<TaskModel> get todayPending =>
+      todayTasks.where((task) => !task.isCompleted).toList();
 
   // إضافة مهمة جديدة
   Future<void> addTask(TaskModel task) async {
@@ -52,6 +63,28 @@ class TasksCubit extends Cubit<TasksStates> {
   Future<void> deleteTask(TaskModel task) async {
     try {
       await task.delete(); // حذف من Hive
+      getTasks();
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
+    }
+  }
+
+  // تعديل مهمة
+  Future<void> editTask(TaskModel task, String title, String date) async {
+    try {
+      task.title = title;
+      task.date = date;
+      await task.save();
+      getTasks();
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
+    }
+  }
+
+  // مسح كل المهام (عند تسجيل الخروج)
+  Future<void> clearTasks() async {
+    try {
+      await Hive.box<TaskModel>(tasksBoxName).clear();
       getTasks();
     } catch (e) {
       emit(TasksFailureState(errorMessage: e.toString()));
