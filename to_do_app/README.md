@@ -110,46 +110,48 @@ lib/
 │   └── task_builder.dart
 └── main.dart
 ```
-🚀 Getting Started
-Prerequisites
-Ensure you have the Flutter SDK installed on your local environment.
+---
 
-Bash
-flutter --version
-Installation Steps
-Clone the repository:
+## 🚀 Getting Started
 
-Bash
-git clone [https://github.com/Muhammadkhiry/DEPI_projects.git](https://github.com/Muhammadkhiry/DEPI_projects.git)
-Navigate to project directory:
+### Prerequisites
 
-Bash
-cd to_do_app
-Install dependencies:
+Ensure you have the Flutter SDK installed: `flutter --version`
 
-Bash
-flutter pub get
-Generate Hive Adapters (if model files are modified):
+### Installation Steps
 
-Bash
-dart run build_runner build --delete-conflicting-outputs
-Run the application:
+1. **Clone the repository:**
+   `git clone https://github.com/Muhammadkhiry/DEPI_projects.git`
 
-Bash
-flutter run
-Run tests:
+2. **Navigate to project directory:**
+   `cd to_do_app`
 
-Bash
-flutter test
-🔮 Future Improvements
-🏷️ Task priorities and custom categories.
+3. **Install dependencies:**
+   `flutter pub get`
 
-🔍 Global task search and sorting options.
+4. **Generate Hive Adapters (if model files are modified):**
+   `dart run build_runner build --delete-conflicting-outputs`
 
-🔔 Local push notification reminders.
+5. **Run the application:**
+   `flutter run`
 
-🌙 Dynamic Dark / Light theme switching.
+6. **Run tests:**
+   `flutter test`
 
-☁️ Cloud synchronization support.
+---
 
-Developed with ❤️ for DEPI Initiative
+## 🔮 Future Improvements
+
+- 🏷️ Task priorities and custom categories.
+- 🔍 Global task search and sorting options.
+- 🔔 Local push notification reminders.
+- 🌙 Dynamic Dark / Light theme switching.
+- ☁️ Cloud synchronization support.
+
+---
+
+<div align="center">
+
+Developed with ❤️ for **DEPI Initiative**
+
+</div>
