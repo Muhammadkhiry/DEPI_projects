@@ -7,7 +7,8 @@ import 'custom_button.dart';
 import 'custom_text_field.dart';
 
 class AddTaskWidget extends StatefulWidget {
-  const AddTaskWidget({super.key});
+  final TaskModel? task; // null = add mode, non-null = edit mode
+  const AddTaskWidget({super.key, this.task});
 
   @override
   State<AddTaskWidget> createState() => _AddTaskWidgetState();
@@ -18,12 +19,30 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
   final TextEditingController dateController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+  bool get isEditing => widget.task != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (isEditing) {
+      titleController.text = widget.task!.title;
+      dateController.text = widget.task!.date;
+    }
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    dateController.dispose();
+    super.dispose();
+  }
+
   // دالة فتح التقويم واختيار التاريخ
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: DateTime.tryParse(dateController.text) ?? DateTime.now(),
+      firstDate: isEditing ? DateTime(2020) : DateTime.now(),
       lastDate: DateTime(2030),
       builder: (context, child) {
         return Theme(
@@ -78,9 +97,9 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                "Add New Task",
-                style: TextStyle(
+              Text(
+                isEditing ? "Edit Task" : "Add New Task",
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -125,20 +144,34 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
               
               // زر الحفظ
               CustomButton(
-                label: "Save Task",
+                label: isEditing ? "Update Task" : "Save Task",
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
-                    final newTask = TaskModel(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      title: titleController.text.trim(),
-                      date: dateController.text.trim(),
-                      isCompleted: false,
-                    );
+                    final cubit = context.read<TasksCubit>();
+                    final rootContext =
+                        Navigator.of(context, rootNavigator: true).context;
+                    final title = titleController.text.trim();
+                    final date = dateController.text.trim();
 
                     Navigator.pop(context);
-                    context.read<TasksCubit>().addTask(newTask);
 
-                    _showDoneDialog(context, "the task is added");
+                    if (isEditing) {
+                      await cubit.editTask(widget.task!, title, date);
+                    } else {
+                      await cubit.addTask(TaskModel(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        title: title,
+                        date: date,
+                        isCompleted: false,
+                      ));
+                    }
+
+                    if (rootContext.mounted) {
+                      _showDoneDialog(
+                        rootContext,
+                        isEditing ? "the task is updated" : "the task is added",
+                      );
+                    }
                   }
                 },
               ),
@@ -152,7 +185,11 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
   void _showDoneDialog(BuildContext context, String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) {
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+        });
+        return AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -174,7 +211,8 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
             ),
           ],
         ),
-      ),
+      );
+      },
     );
   }
 }

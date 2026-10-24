@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/task_cubit/tasks_cubit.dart';
 import '../models/task_model.dart';
+import 'add_task_widget.dart';
 
 class TaskBuilder extends StatelessWidget {
   final List<TaskModel> tasks;
@@ -71,6 +72,17 @@ class TaskBuilder extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, color: Colors.grey),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => AddTaskWidget(task: task),
+                  );
+                },
               ),
               IconButton(
                 icon: const Icon(Icons.delete_outline, color: Colors.grey),
