@@ -109,3 +109,46 @@ lib/
 │   ├── no_tasks_widget.dart
 │   └── task_builder.dart
 └── main.dart
+🚀 Getting Started
+Prerequisites
+Ensure you have the Flutter SDK installed on your local environment.
+
+Bash
+flutter --version
+Installation Steps
+Clone the repository:
+
+Bash
+git clone [https://github.com/Muhammadkhiry/DEPI_projects.git](https://github.com/Muhammadkhiry/DEPI_projects.git)
+Navigate to project directory:
+
+Bash
+cd to_do_app
+Install dependencies:
+
+Bash
+flutter pub get
+Generate Hive Adapters (if model files are modified):
+
+Bash
+dart run build_runner build --delete-conflicting-outputs
+Run the application:
+
+Bash
+flutter run
+Run tests:
+
+Bash
+flutter test
+🔮 Future Improvements
+🏷️ Task priorities and custom categories.
+
+🔍 Global task search and sorting options.
+
+🔔 Local push notification reminders.
+
+🌙 Dynamic Dark / Light theme switching.
+
+☁️ Cloud synchronization support.
+
+Developed with ❤️ for DEPI Initiative
