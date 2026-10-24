@@ -109,6 +109,8 @@ lib/
 │   ├── no_tasks_widget.dart
 │   └── task_builder.dart
 └── main.dart
+```
+
 🚀 Getting Started
 Prerequisites
 Ensure you have the Flutter SDK installed on your local environment.
