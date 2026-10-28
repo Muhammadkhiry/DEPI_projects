@@ -1,22 +1,17 @@
-import 'package:to_do_app/models/task_model.dart';
+import '../../models/task_model.dart';
 
-class TasksStates {}
+abstract class TasksStates {}
 
-class TasksInitial extends TasksStates {}
+class TasksInitialState extends TasksStates {}
 
-class TasksLoading extends TasksStates {}
+class TasksLoadingState extends TasksStates {}
 
-class TasksSuccess extends TasksStates {
+class TasksSuccessState extends TasksStates {
   final List<TaskModel> tasks;
-  final List<TaskModel> completedTasks;
-
-  TasksSuccess({required this.tasks, required this.completedTasks});
+  TasksSuccessState({required this.tasks});
 }
 
-class CompletedTask {}
-
-class TasksError extends TasksStates {
-  final String message;
-
-  TasksError({required this.message});
+class TasksFailureState extends TasksStates {
+  final String errorMessage;
+  TasksFailureState({required this.errorMessage});
 }

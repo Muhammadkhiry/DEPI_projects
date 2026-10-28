@@ -1,83 +1,93 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:to_do_app/cubits/task_cubit/tasks_states.dart';
-import 'package:to_do_app/models/task_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
+import '../../models/task_model.dart';
+import 'tasks_states.dart';
 
 class TasksCubit extends Cubit<TasksStates> {
-  TasksCubit() : super(TasksInitial());
+  TasksCubit() : super(TasksInitialState());
 
+  static const String tasksBoxName = 'tasks_box';
   List<TaskModel> tasks = [];
-  List<TaskModel> completedTasks = [];
-  int _idCounter = 0;
-  
-  void displayTasks() {
-    emit(TasksLoading());
-    emit(
-      TasksSuccess(
-        completedTasks: List.from(completedTasks),
-        tasks: List.from(tasks),
-      ),
-    );
-  }
 
-  void addTask({required String title, required String date}) {
-    if (title.trim().isNotEmpty && date.trim().isNotEmpty) {
-      String generatedId = "T${_idCounter.toString().padLeft(3, '0')}";
-      _idCounter++;
-
-      TaskModel newTask = TaskModel(id: generatedId, title: title, date: date);
-
-      tasks.add(newTask);
-      emit(
-        TasksSuccess(
-          completedTasks: List.from(completedTasks),
-          tasks: List.from(tasks),
-        ),
-      );
-    } else {
-      emit(TasksError(message: "Title or Date cannot be empty"));
+  // جلب كافة المهام
+  void getTasks() async {
+    try {
+      var box = Hive.box<TaskModel>(tasksBoxName);
+      tasks = box.values.toList();
+      emit(TasksSuccessState(tasks: tasks));
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
     }
   }
 
-  void completeTask(TaskModel task) {
-    task.isDone = true;
-    tasks.remove(task);
-    completedTasks.add(task);
-    emit(
-      TasksSuccess(
-        tasks: List.from(tasks),
-        completedTasks: List.from(completedTasks),
-      ),
-    );
+  // Getter للمهام المكتملة
+  List<TaskModel> get completedTasks {
+    return tasks.where((task) => task.isCompleted).toList();
   }
 
-  void toggleTaskStatus(TaskModel task) {
-    task.isDone = !task.isDone;
+  String get _today => DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-    if (task.isDone) {
-      tasks.remove(task);
-      completedTasks.add(task);
-    } else {
-      completedTasks.remove(task);
-      tasks.add(task);
+  // مهام النهارده
+  List<TaskModel> get todayTasks =>
+      tasks.where((task) => task.date == _today).toList();
+
+  // مهام النهارده غير المكتملة
+  List<TaskModel> get todayPending =>
+      todayTasks.where((task) => !task.isCompleted).toList();
+
+  // إضافة مهمة جديدة
+  Future<void> addTask(TaskModel task) async {
+    emit(TasksLoadingState());
+    try {
+      var box = Hive.box<TaskModel>(tasksBoxName);
+      await box.add(task);
+      getTasks();
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
     }
-
-    emit(
-      TasksSuccess(
-        completedTasks: List.from(completedTasks),
-        tasks: List.from(tasks),
-      ),
-    );
   }
 
-  void deleteTask(String id) {
-    tasks.removeWhere((task) => task.id == id);
-    completedTasks.removeWhere((task) => task.id == id);
+  // تغيير حالة المهمة (مكتملة / غير مكتملة)
+  Future<void> toggleTaskStatus(TaskModel task) async {
+    try {
+      task.isCompleted = !task.isCompleted;
+      await task.save(); // حفظ التعديل في Hive
+      getTasks();
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
+    }
+  }
 
-    emit(
-      TasksSuccess(
-        completedTasks: List.from(completedTasks),
-        tasks: List.from(tasks),
-      ),
-    );
+  // حذف مهمة
+  Future<void> deleteTask(TaskModel task) async {
+    try {
+      await task.delete(); // حذف من Hive
+      getTasks();
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
+    }
+  }
+
+  // تعديل مهمة
+  Future<void> editTask(TaskModel task, String title, String date) async {
+    try {
+      task.title = title;
+      task.date = date;
+      await task.save();
+      getTasks();
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
+    }
+  }
+
+  // مسح كل المهام (عند تسجيل الخروج)
+  Future<void> clearTasks() async {
+    try {
+      await Hive.box<TaskModel>(tasksBoxName).clear();
+      getTasks();
+    } catch (e) {
+      emit(TasksFailureState(errorMessage: e.toString()));
+    }
   }
 }

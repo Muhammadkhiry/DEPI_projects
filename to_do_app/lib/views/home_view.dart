@@ -1,234 +1,288 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:to_do_app/cubits/task_cubit/tasks_cubit.dart';
-import 'package:to_do_app/cubits/task_cubit/tasks_states.dart';
-import 'package:to_do_app/cubits/user_cubit/user_cubit.dart';
-import 'package:to_do_app/models/task_model.dart';
-import 'package:to_do_app/widgets/add_task_widget.dart';
-import 'package:to_do_app/widgets/no_tasks_widget.dart';
-import 'package:to_do_app/widgets/task_builder.dart';
+import '../cubit/task_cubit/tasks_cubit.dart';
+import '../cubit/task_cubit/tasks_states.dart';
+import '../cubit/user_cubit/user_cubit.dart';
+import '../cubit/user_cubit/user_states.dart';
+import '../widgets/add_task_widget.dart';
+import '../widgets/custom_drawer.dart';
+import '../widgets/no_tasks_widget.dart';
+import '../widgets/task_builder.dart';
 
-class HomeView extends StatelessWidget {
-  HomeView({super.key});
+class HomeView extends StatefulWidget {
+  const HomeView({super.key});
 
-  final DateTime now = DateTime.now();
-  late final DateTime date = DateTime(now.year, now.month, now.day);
-  late final String shortMonthName = DateFormat('MMM').format(now);
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  int _selectedTab = 0; // 0: All Tasks, 1: Completed
+
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<TasksCubit>(context).getTasks();
+  }
+
+  void _showTodayReminders(BuildContext context) {
+    final pending = context.read<TasksCubit>().todayPending;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Today's Reminders",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            if (pending.isEmpty)
+              const Text(
+                "You're all caught up for today!",
+                style: TextStyle(color: Colors.grey),
+              )
+            else
+              ...pending.map(
+                (t) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.radio_button_unchecked,
+                      color: Color(0xff00A896)),
+                  title: Text(t.title),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final String userName = BlocProvider.of<UserCubit>(context).userName;
+    final todayDate = DateFormat('MMM dd, yyyy').format(DateTime.now());
 
-    return BlocBuilder<TasksCubit, TasksStates>(
-      builder: (context, state) {
-        return DefaultTabController(
-          length: 2,
-          child: Scaffold(
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: const Color(0xFF00B4D8),
-              shape: const CircleBorder(),
-              child: const Icon(Icons.add, color: Colors.white),
-              onPressed: () {
-                showModalBottomSheet(
-                  showDragHandle: true,
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (context) {
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom,
-                        left: 20,
-                        right: 20,
-                        top: 16,
+    return Scaffold(
+      backgroundColor: const Color(0xffF8F9FA),
+      drawer: const CustomDrawer(),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black87),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_none, color: Colors.black87),
+            onPressed: () => _showTodayReminders(context),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding:  EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Hello Header
+            BlocBuilder<UserCubit, UserStates>(
+              builder: (context, state) {
+                final userName = context.watch<UserCubit>().userName;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Hello, ${userName.isEmpty ? 'User' : userName}",
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
-                      child: AddTaskWidget(),
-                    );
-                  },
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Today: $todayDate",
+                      style: const TextStyle(fontSize: 13, color: Colors.grey),
+                    ),
+                  ],
                 );
               },
             ),
-            backgroundColor: const Color(0xFFF8FAFC),
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              leading: const Icon(Icons.menu, color: Colors.black),
-              actions: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.notifications_none,
-                    color: Colors.black,
+            const SizedBox(height: 20),
+
+            // Daily Focus Card
+            BlocBuilder<TasksCubit, TasksStates>(
+              builder: (context, state) {
+                final tasksCubit = context.watch<TasksCubit>();
+                final todayTasks = tasksCubit.todayTasks;
+                final total = todayTasks.length;
+                final completed =
+                    todayTasks.where((t) => t.isCompleted).length;
+                final double progress = total == 0 ? 0 : completed / total;
+
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xff1C313A),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  onPressed: () {},
-                ),
-              ],
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Hello, $userName",
-                    style: const TextStyle(
-                      fontSize: 28,
-                      color: Color(0xFF0F172A),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "Today: $shortMonthName ${date.day}, ${date.year}",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Container(
-                    width: double.infinity,
-                    height: 133,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFF0F2027),
-                          Color(0xFF203A43),
-                          Color(0xFF2C5364),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Your Daily Focus",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            "Your Daily Focus",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Focus on progress, not perfection.",
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          width: 91,
-                          height: 91,
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              CircularProgressIndicator(
-                                value:
-                                    BlocProvider.of<TasksCubit>(
-                                      context,
-                                    ).completedTasks.length.toDouble() /
-                                    (BlocProvider.of<TasksCubit>(
-                                          context,
-                                        ).completedTasks.length.toDouble() +
-                                        BlocProvider.of<TasksCubit>(
-                                          context,
-                                        ).tasks.length.toDouble()),
-                                strokeWidth: 11,
-                                backgroundColor: Colors.white.withOpacity(0.1),
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Colors.tealAccent,
-                                ),
-                              ),
-                              Center(
-                                child: Text(
-                                  "${BlocProvider.of<TasksCubit>(context).completedTasks.length} / ${BlocProvider.of<TasksCubit>(context).completedTasks.length + BlocProvider.of<TasksCubit>(context).tasks.length}",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  const TabBar(
-                    indicatorColor: Color(0xFF00B4D8),
-                    labelColor: Color(0xFF0F172A),
-                    unselectedLabelColor: Colors.grey,
-                    labelStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    tabs: [
-                      Tab(text: "All Tasks"),
-                      Tab(text: "Completed"),
+                          SizedBox(height: 6),
+                          Text(
+                            "Focus on progress, not perfection.",
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: CircularProgressIndicator(
+                              value: progress,
+                              strokeWidth: 6,
+                              backgroundColor: Colors.white24,
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Color(0xff26A69A),
+                              ),
+                            ),
+                          ),
+                          Text(
+                            "$completed / $total",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                );
+              },
+            ),
+            const SizedBox(height: 25),
 
-                  if (state is TasksLoading)
-                    const Expanded(
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  else if (state is TasksSuccess)
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          buildTaskList(
-                            state.tasks,
-                          ), // Tab 1: All / Active Tasks
-                          buildTaskList(
-                            state.completedTasks,
-                          ), // Tab 2: Completed Tasks
-                        ],
-                      ),
-                    )
-                  else
-                    const Expanded(child: NoTasksWidget()),
+            // Tabs Header
+            Align(
+              alignment: Alignment.center,
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => setState(() => _selectedTab = 0),
+                    child: Column(
+                      children: [
+                        Text(
+                          "All Tasks",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: _selectedTab == 0
+                                ? const Color(0xff00A896)
+                                : Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        if (_selectedTab == 0)
+                          Container(
+                            width: 40,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: const Color(0xff00A896),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 40),
+                  GestureDetector(
+                    onTap: () => setState(() => _selectedTab = 1),
+                    child: Column(
+                      children: [
+                        Text(
+                          "Completed",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: _selectedTab == 1
+                                ? const Color(0xff00A896)
+                                : Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        if (_selectedTab == 1)
+                          Container(
+                            width: 40,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: const Color(0xff00A896),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 15),
+
+            // Tasks List View
+            Expanded(
+              child: BlocBuilder<TasksCubit, TasksStates>(
+                builder: (context, state) {
+                  final tasksCubit = context.watch<TasksCubit>();
+                  final currentList = _selectedTab == 0
+                      ? tasksCubit.tasks
+                      : tasksCubit.completedTasks;
+
+                  if (currentList.isEmpty) {
+                    return const NoTasksWidget();
+                  }
+
+                  return TaskBuilder(tasks: currentList);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xff00A896),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const AddTaskWidget(),
+          );
+        },
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
     );
   }
-}
-
-Widget buildTaskList(List<TaskModel> taskList) {
-  if (taskList.isEmpty) {
-    return const NoTasksWidget();
-  }
-  return ListView.builder(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    itemCount: taskList.length,
-    itemBuilder: (context, index) {
-      return TaskBuilder(taskModel: taskList[index]);
-    },
-  );
 }
