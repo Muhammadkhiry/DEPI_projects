@@ -1,0 +1,19 @@
+# Replace the placeholders with the real GitHub usernames before enabling
+# "Require review from Code Owners" in branch protection.
+#   DEV1 = Mo.Khairy (platform)   DEV2 = design system / shared widgets
+
+# Single-owner files (Dev1)
+/pubspec.yaml                          @DEV1_GITHUB_USERNAME
+/lib/main.dart                         @DEV1_GITHUB_USERNAME
+/lib/firebase_options.dart             @DEV1_GITHUB_USERNAME
+/lib/core/routing/                     @DEV1_GITHUB_USERNAME
+/lib/core/services/service_locator.dart @DEV1_GITHUB_USERNAME
+/firestore.rules                       @DEV1_GITHUB_USERNAME
+/storage.rules                         @DEV1_GITHUB_USERNAME
+/firestore.indexes.json                @DEV1_GITHUB_USERNAME
+/firebase.json                         @DEV1_GITHUB_USERNAME
+/analysis_options.yaml                 @DEV1_GITHUB_USERNAME
+
+# Design system (Dev2)
+/lib/core/theme/                       @DEV2_GITHUB_USERNAME
+/lib/core/widgets/                     @DEV2_GITHUB_USERNAME
