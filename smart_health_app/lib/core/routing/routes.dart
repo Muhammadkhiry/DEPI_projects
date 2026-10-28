@@ -14,6 +14,15 @@ abstract class Routes {
   static const String medicalRecords = '/medicalRecords';
   static const String profile = '/profile';
 
+  // Sub-routes under /bloodDonation
+  // (NO leading slash: nested GoRoute paths must be relative)
+  static const String requestBlood = 'request-blood';
+  static const String requestSuccess = 'request-success';
+  static const String requestDetails = 'request-details';
+  static const String donorRegistration = 'donor-registration';
+  static const String donorRegistered = 'donor-registered';
+  static const String donationHistory = 'donation-history';
+
   // Sub-routes under /profile
   static const String personalInfo = 'personalInfo';
   static const String medicalInfo = 'medicalInfo';

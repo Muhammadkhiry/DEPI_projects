@@ -1,3 +1,5 @@
+// app_router.dart
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +13,18 @@ import 'package:smart_health_app/features/auth/presentation/views/login_view.dar
 import 'package:smart_health_app/features/auth/presentation/views/reset_sent_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/signup_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/verify_email_view.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/donation_history_cubit/donation_history_cubit.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/donor_registration_cubit/donor_registration_cubit.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/models/blood_request_model.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/models/donor_models.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/models/request_details_models.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/request_blood_cubit/request_blood_cubit.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/views/donation_history_view.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/views/donor_registered_view.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/views/donor_registration_view.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/views/request_blood_view.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/views/request_details_page.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/views/request_success_view.dart';
 import 'package:smart_health_app/features/onboarding/presentation/views/onboarding_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/account_privacy_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/help_center_view.dart';
@@ -36,6 +50,52 @@ Widget _placeholder(String title) => Scaffold(
     ),
   ),
 );
+
+/// TEMP: launcher for the blood donation screens until the real
+/// Blood Donation Dashboard is designed. Delete it afterwards.
+class _BloodTempDashboard extends StatelessWidget {
+  const _BloodTempDashboard();
+
+  @override
+  Widget build(BuildContext context) {
+    const base = Routes.bloodDonation;
+    final items = <(String, String, Object?)>[
+      ('Request Blood', '$base/${Routes.requestBlood}', null),
+      ('Become a Donor', '$base/${Routes.donorRegistration}', null),
+      ('Donation History', '$base/${Routes.donationHistory}', null),
+      (
+        'Request Details (requester view)',
+        '$base/${Routes.requestDetails}',
+        const RequestDetailsArgs(requestId: '#REQ-90482', isOwner: true),
+      ),
+      (
+        'Request Details (donor view)',
+        '$base/${Routes.requestDetails}',
+        const RequestDetailsArgs(requestId: '#REQ-90482', isOwner: false),
+      ),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Blood Donation (temp)'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
+      ),
+      body: ListView.separated(
+        itemCount: items.length,
+        separatorBuilder: (_, __) => const Divider(height: 1),
+        itemBuilder: (context, i) {
+          final item = items[i];
+          return ListTile(
+            title: Text(item.$1),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(item.$2, extra: item.$3),
+          );
+        },
+      ),
+    );
+  }
+}
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -188,6 +248,7 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
+
         // Tab 2: Doctors
         StatefulShellBranch(
           routes: [
@@ -236,38 +297,81 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
+
         // Tab 3: Blood Donation
         StatefulShellBranch(
           routes: [
             GoRoute(
               path: Routes.bloodDonation,
-              builder: (context, state) =>
-                  _placeholder('Blood Donation Dashboard'),
+              // TEMP launcher. Replace with the real dashboard later.
+              builder: (context, state) => const _BloodTempDashboard(),
               routes: [
                 GoRoute(
                   path: 'find-donors',
                   builder: (context, state) => _placeholder('Find Donors'),
                 ),
+
+                // --- Request Blood (2 steps) + confirmation ---
                 GoRoute(
-                  path: 'request-blood',
-                  builder: (context, state) => _placeholder('Create Request'),
+                  path: Routes.requestBlood,
+                  builder: (context, state) => BlocProvider(
+                    create: (_) => RequestBloodCubit(),
+                    child: const RequestBloodView(),
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: Routes.requestSuccess,
+                      builder: (context, state) => RequestSuccessView(
+                        request: state.extra as BloodRequestModel,
+                      ),
+                    ),
+                  ],
                 ),
+
+                // --- Request Details (requester / donor view) ---
                 GoRoute(
-                  path: 'request-details',
-                  builder: (context, state) => _placeholder('Request Details'),
+                  path: Routes.requestDetails,
+                  builder: (context, state) => RequestDetailsPage(
+                    args:
+                        (state.extra as RequestDetailsArgs?) ??
+                        // fallback so it opens without arguments while testing
+                        const RequestDetailsArgs(
+                          requestId: '#REQ-90482',
+                          isOwner: true,
+                        ),
+                  ),
                 ),
+
+                // --- Donor registration (2 steps) + registered ---
                 GoRoute(
-                  path: 'donor-profile',
-                  builder: (context, state) => _placeholder('Donor Profile'),
+                  path: Routes.donorRegistration,
+                  builder: (context, state) => BlocProvider(
+                    create: (_) => DonorRegistrationCubit(),
+                    child: const DonorRegistrationView(),
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: Routes.donorRegistered,
+                      builder: (context, state) => DonorRegisteredView(
+                        profile: state.extra as DonorProfileModel,
+                      ),
+                    ),
+                  ],
                 ),
+
+                // --- Donation history ---
                 GoRoute(
-                  path: 'donation-history',
-                  builder: (context, state) => _placeholder('Donation History'),
+                  path: Routes.donationHistory,
+                  builder: (context, state) => BlocProvider(
+                    create: (_) => DonationHistoryCubit()..load(),
+                    child: const DonationHistoryView(),
+                  ),
                 ),
               ],
             ),
           ],
         ),
+
         // Tab 4: Records
         StatefulShellBranch(
           routes: [
@@ -298,6 +402,7 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
+
         // Tab 5: Profile
         StatefulShellBranch(
           routes: [
@@ -322,7 +427,7 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: Routes.notificationSettings,
                   builder: (context, state) => const NotificationSettingsView(),
-                ), // const NotificationSettingsView(),
+                ),
                 GoRoute(
                   path: Routes.accountPrivacy,
                   builder: (context, state) => const AccountPrivacyView(),
