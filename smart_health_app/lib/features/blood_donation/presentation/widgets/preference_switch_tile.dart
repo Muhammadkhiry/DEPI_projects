@@ -54,7 +54,7 @@ class PreferenceSwitchTile extends StatelessWidget {
           ),
           Switch(
             value: value,
-            activeColor: AppColors.white,
+            activeThumbColor: AppColors.white,
             activeTrackColor: AppColors.primary,
             onChanged: onChanged,
           ),

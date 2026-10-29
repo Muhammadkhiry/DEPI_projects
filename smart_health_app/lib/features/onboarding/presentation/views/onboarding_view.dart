@@ -53,17 +53,23 @@ class _OnboardingViewState extends State<OnboardingView> {
     ),
   ];
 
-  void _onNextPressed() async {
+  Future<void> _finishOnboarding() async {
+    // Must save the flag first: the router sends users back to onboarding
+    // until it is set (this is why "Skip" used to do nothing).
+    await CacheHelper.saveData(key: 'isOnboardingSeen', value: true);
+    if (mounted) {
+      context.go(Routes.login);
+    }
+  }
+
+  Future<void> _onNextPressed() async {
     if (_currentIndex < _pages.length - 1) {
-      _pageController.nextPage(
+      await _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
-      await CacheHelper.saveData(key: 'isOnboardingSeen', value: true);
-      if (mounted) {
-        context.go(Routes.login);
-      }
+      await _finishOnboarding();
     }
   }
 
@@ -80,7 +86,7 @@ class _OnboardingViewState extends State<OnboardingView> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () => context.go('/login'),
+                  onPressed: _finishOnboarding,
                   child: const Text(
                     'Skip',
                     style: TextStyle(

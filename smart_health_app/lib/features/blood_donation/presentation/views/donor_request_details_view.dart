@@ -51,7 +51,6 @@ class DonorRequestDetailsView extends StatelessWidget {
               color: AppColors.textDark,
               size: 20,
             ),
-            // TODO: share_plus
             onPressed: () => _snack(context, 'Share link copied'),
           ),
           const Padding(
@@ -76,7 +75,7 @@ class DonorRequestDetailsView extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                   const Text(
                       "Couldn't load this request.",
                       style: AppTextStyles.bodyLarge,
                     ),
@@ -264,9 +263,9 @@ class _UnlockedContact extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.08),
+        color: AppColors.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.primary.withOpacity(0.35)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -87,7 +87,6 @@ class RequesterRequestDetailsView extends StatelessWidget {
                   color: AppColors.textDark,
                   size: 20,
                 ),
-                // TODO: share_plus
                 onPressed: () => _snack(context, 'Share link copied'),
               ),
               const Padding(
@@ -108,7 +107,7 @@ class RequesterRequestDetailsView extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                 const Text(
                     "Couldn't load this request.",
                     style: AppTextStyles.bodyLarge,
                   ),
@@ -166,7 +165,6 @@ class _Body extends StatelessWidget {
 
         RequestSummaryCard(
           request: req,
-          // TODO: url_launcher (maps / tel:)
           onDirections: () => onSnack('Opening directions...'),
           onCall: () => onSnack('Calling ${req.phone}...'),
         ),

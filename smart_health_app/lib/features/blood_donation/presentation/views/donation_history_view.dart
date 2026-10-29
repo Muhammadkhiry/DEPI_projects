@@ -62,7 +62,7 @@ class DonationHistoryView extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      const Text(
                         "Couldn't load your donations.",
                         style: AppTextStyles.bodyLarge,
                       ),
@@ -239,7 +239,7 @@ class _ProfileHeader extends StatelessWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.secondary.withOpacity(0.1),
+                    color: AppColors.secondary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -260,7 +260,7 @@ class _ProfileHeader extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.secondary.withOpacity(0.1),
+              color: AppColors.secondary.withValues(alpha: 0.1),
             ),
             child: const Icon(
               Icons.water_drop,
@@ -397,7 +397,7 @@ class _EmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
+          const Text(
             'Your confirmed and self-reported donations will appear here.',
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyMedium,
@@ -460,7 +460,7 @@ class _AddDonationSheetState extends State<_AddDonationSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Add past donation', style: AppTextStyles.headlineMedium),
+          const Text('Add past donation', style: AppTextStyles.headlineMedium),
           const SizedBox(height: 4),
           Text(
             'It will be marked "Self-reported" until a facility confirms it.',

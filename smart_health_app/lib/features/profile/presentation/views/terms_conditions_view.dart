@@ -15,21 +15,21 @@ class TermsConditionsView extends StatelessWidget {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+      body: const SingleChildScrollView(
+        padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Terms of Service', style: AppTextStyles.headlineMedium),
-            const SizedBox(height: 12),
-            const Text(
+            SizedBox(height: 12),
+            Text(
               'Welcome to Smart Health. By using our application, you agree to comply with and be bound by the following terms and conditions regarding healthcare services, data privacy, and booking policies.',
               style: AppTextStyles.bodyMedium,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Text('Privacy Policy', style: AppTextStyles.headlineMedium),
-            const SizedBox(height: 12),
-            const Text(
+            SizedBox(height: 12),
+            Text(
               'We collect personal and medical details solely to improve your healthcare experience. Your data will never be shared with third parties without your explicit consent.',
               style: AppTextStyles.bodyMedium,
             ),

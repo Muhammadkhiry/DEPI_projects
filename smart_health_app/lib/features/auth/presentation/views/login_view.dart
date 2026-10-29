@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/config/app_config.dart';
 import 'package:smart_health_app/core/constants/app_assets.dart';
 import 'package:smart_health_app/core/routing/routes.dart';
 import 'package:smart_health_app/core/services/service_locator.dart';
@@ -98,9 +99,9 @@ class _LoginViewState extends State<LoginView> {
                       ),
                       const SizedBox(height: 24),
 
-                      Text('Welcome back', style: AppTextStyles.headlineLarge),
+                      const Text('Welcome back', style: AppTextStyles.headlineLarge),
                       const SizedBox(height: 6),
-                      Text(
+                      const Text(
                         'Log in to manage your appointments and records.',
                         style: AppTextStyles.bodyMedium,
                       ),
@@ -165,13 +166,17 @@ class _LoginViewState extends State<LoginView> {
                           : CustomButton(
                               text: 'Log in',
                               onPressed: () {
-                                // if (_formKey.currentState!.validate()) {
-                                //   context.read<AuthCubit>().login(
-                                //     email: _emailController.text.trim(),
-                                //     password: _passwordController.text,
-                                //   );
-                                // }
-                                context.go(Routes.home);
+                                // Dev shortcut: --dart-define=BYPASS_AUTH=true
+                                if (AppConfig.bypassAuth) {
+                                  context.go(Routes.home);
+                                  return;
+                                }
+                                if (_formKey.currentState!.validate()) {
+                                  context.read<AuthCubit>().login(
+                                    email: _emailController.text.trim(),
+                                    password: _passwordController.text,
+                                  );
+                                }
                               },
                             ),
                       const SizedBox(height: 24),

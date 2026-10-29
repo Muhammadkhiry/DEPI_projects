@@ -29,7 +29,7 @@ class UrgencyOptionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? _color.withOpacity(0.06) : AppColors.white,
+          color: selected ? _color.withValues(alpha: 0.06) : AppColors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: selected ? _color : AppColors.border,
@@ -64,7 +64,7 @@ class UrgencyOptionCard extends StatelessWidget {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: _color.withOpacity(0.12),
+                          color: _color.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(

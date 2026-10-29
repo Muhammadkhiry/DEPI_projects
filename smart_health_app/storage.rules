@@ -1,0 +1,20 @@
+rules_version = '2';
+
+// Task 1.7: Storage rules v1. Default is DENY.
+// ASSUMPTION: every file lives under users/{uid}/... (profile photo, records).
+// Dev5 must confirm the exact paths; adjust here if they differ.
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /users/{uid}/{allPaths=**} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      allow create, update: if request.auth != null
+                            && request.auth.uid == uid
+                            && request.resource.size < 10 * 1024 * 1024
+                            && request.resource.contentType.matches('image/.*|application/pdf');
+
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

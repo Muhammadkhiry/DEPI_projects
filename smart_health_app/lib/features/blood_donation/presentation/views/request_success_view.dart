@@ -40,7 +40,7 @@ class RequestSuccessView extends StatelessWidget {
                 height: 88,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.primary.withOpacity(0.12),
+                  color: AppColors.primary.withValues(alpha: 0.12),
                 ),
                 child: Center(
                   child: Container(
@@ -59,9 +59,9 @@ class RequestSuccessView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Text('Request posted', style: AppTextStyles.headlineLarge),
+             const Text('Request posted', style: AppTextStyles.headlineLarge),
               const SizedBox(height: 6),
-              Text(
+              const Text(
                 'Your blood request is now live on the Smart Health public board.',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodyMedium,
@@ -220,7 +220,7 @@ class _SummaryCard extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withOpacity(0.1),
+                  color: AppColors.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(

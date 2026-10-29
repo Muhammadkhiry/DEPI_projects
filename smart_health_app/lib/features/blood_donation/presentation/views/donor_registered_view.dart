@@ -40,7 +40,7 @@ class DonorRegisteredView extends StatelessWidget {
                 height: 88,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.primary.withOpacity(0.12),
+                  color: AppColors.primary.withValues(alpha: 0.12),
                 ),
                 child: Center(
                   child: Container(
@@ -59,7 +59,7 @@ class DonorRegisteredView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Text("You're registered!", style: AppTextStyles.headlineLarge),
+             const Text("You're registered!", style: AppTextStyles.headlineLarge),
               const SizedBox(height: 6),
               Text(
                 'Welcome to the Smart Health voluntary donor network, ${profile.firstName}. Your commitment helps save lives.',
@@ -198,7 +198,7 @@ class _ProfileCard extends StatelessWidget {
                   vertical: 3,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.12),
+                  color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(

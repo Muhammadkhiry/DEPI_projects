@@ -10,6 +10,14 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit(this.authRepo) : super(AuthInitial());
 
+  /// The router redirects as soon as FirebaseAuth reports a new user (task
+  /// 1.8), which disposes the screen and closes this cubit while a request is
+  /// still finishing. Ignore those late emits instead of throwing.
+  @override
+  void emit(AuthState state) {
+    if (!isClosed) super.emit(state);
+  }
+
   Future<void> login({required String email, required String password}) async {
     emit(AuthLoading());
     final result = await authRepo.loginWithEmailAndPassword(

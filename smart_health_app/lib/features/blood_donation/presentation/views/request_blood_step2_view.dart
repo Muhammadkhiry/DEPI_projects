@@ -291,7 +291,7 @@ class _MapPlaceholder extends StatelessWidget {
           height: 140,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: AppColors.tertiary.withOpacity(0.15),
+            color: AppColors.tertiary.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.border),
           ),

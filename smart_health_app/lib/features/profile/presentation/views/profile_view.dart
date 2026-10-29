@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/config/app_config.dart';
 import 'package:smart_health_app/core/routing/routes.dart';
+import 'package:smart_health_app/core/services/service_locator.dart';
+import 'package:smart_health_app/features/auth/presentation/domain/repos/auth_repo.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -14,6 +17,22 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   bool isDonorActive = true;
+
+  Future<void> _logout() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    final result = await getIt<AuthRepo>().logout();
+    result.fold(
+      (failure) =>
+          messenger.showSnackBar(SnackBar(content: Text(failure.errMessage))),
+      (_) {
+        // Normally the router sends the user to the login screen by itself
+        // as soon as FirebaseAuth reports the sign-out. With BYPASS_AUTH the
+        // guards are off, so navigate manually.
+        if (AppConfig.bypassAuth) router.go(Routes.login);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +87,10 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                       const SizedBox(width: 8),
                       // Avatar Badges
-                      CircleAvatar(
+                     const CircleAvatar(
                         radius: 16,
                         backgroundColor: AppColors.primary,
-                        child: const Text(
+                        child:  Text(
                           'SJ',
                           style: TextStyle(
                             color: AppColors.white,
@@ -395,7 +414,9 @@ class _ProfileViewState extends State<ProfileView> {
                       icon: Icons.water_drop_outlined,
                       title: 'Donation history',
                       subtitle: '3 donations logged',
-                      onTap: () {},
+                      onTap: () => context.go(
+                        '${Routes.bloodDonation}/${Routes.donationHistory}',
+                      ),
                     ),
                   ],
                 ),
@@ -489,7 +510,7 @@ class _ProfileViewState extends State<ProfileView> {
                     size: 14,
                     color: AppColors.secondary,
                   ),
-                  onTap: () => context.go(Routes.login),
+                  onTap: _logout,
                 ),
               ),
               const SizedBox(height: 28),

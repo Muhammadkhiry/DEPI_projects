@@ -8,7 +8,7 @@ import '../../../../core/theme/app_text_styles.dart';
 class ResetSentView extends StatelessWidget {
   final String email;
 
-  const ResetSentView({super.key, this.email = 'sarah.jenkins@email.com'});
+  const ResetSentView({super.key, this.email = ''});
 
   @override
   Widget build(BuildContext context) {
@@ -122,8 +122,8 @@ class ResetSentView extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              const Padding(
+                padding:  EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
                   "We've sent a password reset link to your email. Click the link to choose a new password.",
                   style: AppTextStyles.bodyMedium,

@@ -1,0 +1,63 @@
+rules_version = '2';
+
+// Task 1.7: Firestore rules v1. Default is DENY; every path below is opt-in.
+// ASSUMPTIONS to confirm with Dev3/Dev4/Dev5 (see TODO markers):
+//  - users/{uid}/records, users/{uid}/donations live under the user
+//  - appointments are top-level docs with a `userId` field
+//  - slot locks are top-level docs in `slots` with a `userId` field
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // --- Users and their private sub-collections -------------------------
+    match /users/{uid} {
+      allow read, create, update, delete: if isOwner(uid);
+
+      match /records/{recordId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      match /donations/{donationId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // --- Doctors: read-only for signed-in users (seeded by admin/emulator) -
+    match /doctors/{doctorId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // --- Appointments -----------------------------------------------------
+    // TODO(Dev3): once the slot-lock doc ID format is final, require the lock
+    // in the same batch using existsAfter()/getAfter() on /slots/{lockId}.
+    match /appointments/{appointmentId} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+      allow create: if signedIn()
+                    && request.resource.data.userId == request.auth.uid;
+      allow update: if signedIn()
+                    && resource.data.userId == request.auth.uid
+                    && request.resource.data.userId == resource.data.userId;
+      allow delete: if signedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // --- Slot locks: a doc's existence means the slot is taken ------------
+    match /slots/{lockId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+                    && request.resource.data.userId == request.auth.uid;
+      allow update: if false;
+      allow delete: if signedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // TODO(Dev4): blood requests/responses collections are NOT opened yet.
+    // Add rules here only if the Firestore fallback (task 4.4) is used.
+  }
+}

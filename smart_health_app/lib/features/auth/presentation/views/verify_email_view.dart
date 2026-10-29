@@ -2,15 +2,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/config/app_config.dart';
 import 'package:smart_health_app/core/routing/routes.dart';
+import 'package:smart_health_app/core/services/auth_session.dart';
+import 'package:smart_health_app/core/services/service_locator.dart';
+import 'package:smart_health_app/features/auth/presentation/domain/repos/auth_repo.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
 class VerifyEmailView extends StatelessWidget {
-  final String email;
+  /// Optional override. By default the signed-in user's email is shown.
+  final String? email;
 
-  const VerifyEmailView({super.key, this.email = 'sarah.jenkins@email.com'});
+  const VerifyEmailView({super.key, this.email});
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +60,8 @@ class VerifyEmailView extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              const Padding(
+                padding:  EdgeInsets.symmetric(horizontal: 12.0),
                 child: Text(
                   'Tap the link we sent, then come back here to continue setting up your account.',
                   style: AppTextStyles.bodyMedium,
@@ -86,7 +91,7 @@ class VerifyEmailView extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      email,
+                      email ?? getIt<AuthSession>().email ?? '',
                       style: AppTextStyles.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -120,23 +125,19 @@ class VerifyEmailView extends StatelessWidget {
                     ),
                   ),
                   onPressed: () async {
-                    final user = FirebaseAuth.instance.currentUser;
-                    await user?.reload();
+                    final verified = await getIt<AuthSession>()
+                        .refreshEmailVerified();
+                    if (!context.mounted) return;
 
-                    // if (user != null && user.emailVerified) {
-                    //   if (context.mounted) {
-                    //   }
-                    if (context.mounted) {
+                    if (verified || AppConfig.bypassAuth) {
                       context.go(Routes.completeProfile);
-                    } // } else {
-                    //   if (context.mounted) {
-                    //     ScaffoldMessenger.of(context).showSnackBar(
-                    //       const SnackBar(
-                    //         content: Text('Please verify your email first.'),
-                    //       ),
-                    //     );
-                    //   }
-                    // }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please verify your email first.'),
+                        ),
+                      );
+                    }
                   },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -207,7 +208,14 @@ class VerifyEmailView extends StatelessWidget {
 
               // Change Email Text Link
               GestureDetector(
-                onTap: () => context.pop(),
+                onTap: () async {
+                  // The unverified account is signed out so a different email
+                  // can be used. Capture the router first: this screen is
+                  // disposed as soon as the router redirects.
+                  final router = GoRouter.of(context);
+                  await getIt<AuthRepo>().logout();
+                  router.go(Routes.signUp);
+                },
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
