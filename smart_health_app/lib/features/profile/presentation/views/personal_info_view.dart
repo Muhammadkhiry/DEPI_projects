@@ -385,8 +385,8 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                                 color: AppColors.neutralBg,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: Row(
-                                children: const [
+                              child:const Row(
+                                children:  [
                                   Text('🇪🇬', style: TextStyle(fontSize: 16)),
                                   SizedBox(width: 4),
                                   Text(

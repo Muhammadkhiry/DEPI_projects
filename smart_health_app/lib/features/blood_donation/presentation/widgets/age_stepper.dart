@@ -35,7 +35,7 @@ class AgeStepper extends StatelessWidget {
                   style: AppTextStyles.headlineLarge
                       .copyWith(color: AppColors.primary)),
               const SizedBox(width: 6),
-              Text('years', style: AppTextStyles.bodyMedium),
+             const Text('years', style: AppTextStyles.bodyMedium),
             ],
           ),
           _btn(Icons.add, true, onIncrement),

@@ -134,7 +134,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(
+                const Text(
                   'Help us personalize your clinical care and blood donation eligibility.',
                   style: AppTextStyles.bodyMedium,
                 ),
@@ -418,8 +418,8 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                       ),
                     ),
                     if (selectedBloodType == 'O-')
-                      Row(
-                        children: const [
+                      const Row(
+                        children:  [
                           Icon(
                             Icons.ac_unit,
                             size: 14,

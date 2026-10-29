@@ -37,7 +37,7 @@ class DonationPreferencesStep extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    _SectionTitle(
+                   const _SectionTitle(
                       'Health & Safety Self-Declaration',
                       subtitle:
                           'Confirm you meet standard clinical criteria today:',
@@ -67,7 +67,7 @@ class DonationPreferencesStep extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    _SectionTitle(
+                   const _SectionTitle(
                       'In-App Coordination',
                       subtitle: 'Control how hospital appeals appear when you check the app:',
                     ),
@@ -94,7 +94,7 @@ class DonationPreferencesStep extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    _SectionTitle('Clinical Consent'),
+                   const _SectionTitle('Clinical Consent'),
                     CheckTile(
                       value: s.consentAgreed,
                       onChanged: cubit.setConsent,

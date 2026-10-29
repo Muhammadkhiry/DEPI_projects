@@ -1,9 +1,10 @@
 // app_router.dart
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/config/app_config.dart';
+import 'package:smart_health_app/core/services/auth_session.dart';
 import 'package:smart_health_app/core/services/service_locator.dart';
 import 'package:smart_health_app/core/utils/cache_helper.dart';
 import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_cubit.dart';
@@ -102,43 +103,52 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: Routes.onboarding,
+  // Re-run `redirect` whenever the user signs in/out or verifies the email.
+  refreshListenable: getIt<AuthSession>(),
   redirect: (context, state) {
+    final session = getIt<AuthSession>();
     final bool isOnboardingSeen = CacheHelper.getBool(key: 'isOnboardingSeen');
-    // ignore: unused_local_variable
-    final bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
+    final String location = state.matchedLocation;
 
-    final String currentLocation = state.matchedLocation;
+    final bool isOnboarding = location == Routes.onboarding;
+    // Screens a signed-out user is allowed to see.
+    final bool isPublicAuthRoute =
+        location == Routes.login ||
+        location == Routes.signUp ||
+        location == Routes.forgotPassword ||
+        location == Routes.resetSent;
+    final bool isVerifyEmail = location == Routes.verifyEmail;
+    final bool isCompleteProfile = location == Routes.completeProfile;
 
-    final bool isGoingToOnboarding = currentLocation == Routes.onboarding;
-    final bool isGoingToAuth =
-        currentLocation == Routes.login ||
-        currentLocation == Routes.signUp ||
-        currentLocation == Routes.forgotPassword ||
-        currentLocation == Routes.resetSent ||
-        currentLocation == Routes.verifyEmail;
-
-    final bool isGoingToCompleteProfile =
-        currentLocation == Routes.completeProfile;
-
-    // 1. لو ماشافش الـ Onboarding
+    // 1. Onboarding not seen yet: it is the only screen allowed.
     if (!isOnboardingSeen) {
-      return isGoingToOnboarding ? null : Routes.onboarding;
+      return isOnboarding ? null : Routes.onboarding;
     }
 
-    // 2. لو بيحاول يروح لشاشة Complete Profile سيبه يدخلها بدون تحويل
-    if (isGoingToCompleteProfile) {
-      return null;
+    // Terms must be readable before signing up.
+    if (location == Routes.publicTerms) return null;
+
+    // Dev shortcut (flutter run --dart-define=BYPASS_AUTH=true):
+    // skip the login guards so every screen can be opened.
+    if (AppConfig.bypassAuth) {
+      return isOnboarding ? Routes.home : null;
     }
 
-    // 3. لو مش مسجل دخول وبيحاول يدخل شاشة رئيسية
-    // if (!isLoggedIn) {
-    //   return isGoingToAuth ? null : Routes.login;
-    // }
-
-    // 4. لو مسجل دخول وبيحاول يروح لصفحات الـ Auth
-    if (isGoingToAuth || isGoingToOnboarding) {
-      return Routes.home;
+    // 2. Signed out: only login / sign up / forgot password screens.
+    if (!session.isLoggedIn) {
+      return isPublicAuthRoute ? null : Routes.login;
     }
+
+    // 3. Signed in but email not verified yet: stay on the verify screen.
+    if (!session.isEmailVerified) {
+      return isVerifyEmail ? null : Routes.verifyEmail;
+    }
+
+    // 4. Signed in and verified.
+    if (isCompleteProfile) return null;
+    // Just verified the email: next step of onboarding is the profile.
+    if (isVerifyEmail) return Routes.completeProfile;
+    if (isPublicAuthRoute || isOnboarding) return Routes.home;
 
     return null;
   },
@@ -159,7 +169,12 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: Routes.resetSent,
-      builder: (context, state) => const ResetSentView(),
+      builder: (context, state) =>
+          ResetSentView(email: state.extra as String? ?? ''),
+    ),
+    GoRoute(
+      path: Routes.publicTerms,
+      builder: (context, state) => const TermsConditionsView(),
     ),
     GoRoute(
       path: Routes.verifyEmail,

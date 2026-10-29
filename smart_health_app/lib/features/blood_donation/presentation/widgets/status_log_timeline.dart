@@ -51,7 +51,7 @@ class StatusLogTimeline extends StatelessWidget {
                   height: 28,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: color.withOpacity(0.12),
+                    color: color.withValues(alpha: 0.12),
                   ),
                   child: Icon(icon, size: 15, color: color),
                 ),

@@ -1,5 +1,7 @@
-# Task 1.1: team lint rules. Requires `very_good_analysis` in dev_dependencies
-# (added by scripts/add_packages.ps1). Run `flutter pub get` first.
+# Task 1.1: team lint rules, based on very_good_analysis.
+# The existing code was written before this config, so the noisy style-only
+# rules are switched off for now. Turn them back on one at a time later
+# (run `dart fix --apply` in a dedicated PR when you do).
 include: package:very_good_analysis/analysis_options.yaml
 
 analyzer:
@@ -14,12 +16,52 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - lib/firebase_options.dart
+  language:
+    strict-casts: true
+    # Temporarily relaxed: many Future.delayed / showDialog calls in mock code.
+    strict-inference: false
+    strict-raw-types: false
 
 linter:
   rules:
-    # Too noisy for a student/team app; keep the rest of the strict rules.
+    # --- Too noisy for this project --------------------------------------
     public_member_api_docs: false
     lines_longer_than_80_chars: false
     flutter_style_todos: false
-    # The codebase already uses relative imports in places; allow both for now.
     always_use_package_imports: false
+
+    # --- Pure style, no bug-finding value right now ----------------------
+    sort_constructors_first: false
+    unnecessary_type_name_in_constructor: false
+    always_put_required_named_parameters_first: false
+    prefer_int_literals: false
+    prefer_single_quotes: false
+    eol_at_end_of_file: false
+    directives_ordering: false
+    simple_directive_paths: false
+    omit_local_variable_types: false
+    prefer_final_locals: false
+    avoid_redundant_argument_values: false
+    cascade_invocations: false
+    unnecessary_lambdas: false
+    unnecessary_breaks: false
+    unnecessary_underscores: false
+    unnecessary_raw_strings: false
+    empty_container_bodies: false
+    leading_newlines_in_multiline_strings: false
+    avoid_escaping_inner_quotes: false
+    prefer_if_elements_to_conditional_expressions: false
+    use_null_aware_elements: false
+    avoid_types_on_closure_parameters: false
+    specify_nonobvious_property_types: false
+    document_ignores: false
+    noop_primitive_operations: false
+
+    # --- Real issues, but too many to fix in this pass -------------------
+    # TODO(Dev1): re-enable these in follow-up PRs, one rule at a time.
+    avoid_catches_without_on_clauses: false
+    discarded_futures: false
+    unawaited_futures: false
+    avoid_positional_boolean_parameters: false
+    cast_nullable_to_non_nullable: false
+    avoid_void_async: false

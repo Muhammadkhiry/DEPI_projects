@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_health_app/core/routing/routes.dart';
+import 'package:smart_health_app/core/services/service_locator.dart';
+import 'package:smart_health_app/core/utils/app_validators.dart';
+import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_cubit.dart';
+import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_state.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -14,9 +20,49 @@ class ForgotPasswordView extends StatefulWidget {
 }
 
 class _ForgotPasswordViewState extends State<ForgotPasswordView> {
-  final TextEditingController _emailController = TextEditingController(
-    text: 'sarah.jenkins@email.com',
-  );
+  final TextEditingController _emailController = TextEditingController();
+
+  late final AuthCubit _authCubit = getIt<AuthCubit>();
+  StreamSubscription<AuthState>? _authSubscription;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _authSubscription = _authCubit.stream.listen((state) {
+      if (!mounted) return;
+      setState(() => _isLoading = state is AuthLoading);
+      if (state is AuthFailure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.errMessage),
+            backgroundColor: AppColors.secondary,
+          ),
+        );
+      } else if (state is AuthSuccess) {
+        // Pass the email along so the next screen can show it.
+        context.push(Routes.resetSent, extra: _emailController.text.trim());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    unawaited(_authSubscription?.cancel());
+    unawaited(_authCubit.close());
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final email = _emailController.text.trim();
+    final error = AppValidators.validateEmail(email);
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      return;
+    }
+    _authCubit.sendPasswordReset(email: email);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +109,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              const Padding(
+                padding:  EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
                   "Enter the email associated with your account and we'll send you a secure link to reset your password.",
                   style: AppTextStyles.bodyMedium,
@@ -148,9 +194,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: () => context.push(
-                          Routes.resetSent,
-                        ),
+                        onPressed: _isLoading ? null : _submit,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

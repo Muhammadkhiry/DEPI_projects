@@ -25,12 +25,12 @@ class UserModel {
     final data = snapshot.data();
     return UserModel(
       uid: snapshot.id,
-      email: data?['email'] ?? '',
-      name: data?['name'],
-      phoneNumber: data?['phoneNumber'],
-      bloodType: data?['bloodType'],
-      profilePicUrl: data?['profilePicUrl'],
-      isProfileCompleted: data?['isProfileCompleted'] ?? false,
+      email: data?['email'] as String? ?? '',
+      name: data?['name'] as String?,
+      phoneNumber: data?['phoneNumber'] as String?,
+      bloodType: data?['bloodType'] as String?,
+      profilePicUrl: data?['profilePicUrl'] as String?,
+      isProfileCompleted: data?['isProfileCompleted'] as bool? ?? false,
       createdAt: (data?['createdAt'] as Timestamp?)?.toDate(),
     );
   }
