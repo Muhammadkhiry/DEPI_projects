@@ -6,6 +6,8 @@ abstract class Routes {
   static const String resetSent = '/resetSent';
   static const String verifyEmail = '/verifyEmail';
   static const String completeProfile = '/completeProfile';
+  // Loading screen shown while the profile is fetched after sign-in.
+  static const String splash = '/splash';
   // Terms page reachable while signed out (opened from the sign-up screen).
   static const String publicTerms = '/terms';
 

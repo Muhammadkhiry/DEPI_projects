@@ -13,6 +13,7 @@ import 'package:smart_health_app/features/auth/presentation/views/forgot_passwor
 import 'package:smart_health_app/features/auth/presentation/views/login_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/reset_sent_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/signup_view.dart';
+import 'package:smart_health_app/features/auth/presentation/views/splash_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/verify_email_view.dart';
 import 'package:smart_health_app/features/blood_donation/presentation/donation_history_cubit/donation_history_cubit.dart';
 import 'package:smart_health_app/features/blood_donation/presentation/donor_registration_cubit/donor_registration_cubit.dart';
@@ -144,11 +145,26 @@ final GoRouter appRouter = GoRouter(
       return isVerifyEmail ? null : Routes.verifyEmail;
     }
 
-    // 4. Signed in and verified.
+    // 4. Signed in and verified: wait until we know whether the profile is
+    //    complete (a few hundred ms, shows the splash screen).
+    if (session.profileStatus == ProfileStatus.unknown) {
+      return location == Routes.splash ? null : Routes.splash;
+    }
+
+    // Where a user lands after signing in or verifying the email.
+    final String landing = session.profileStatus == ProfileStatus.completed
+        ? Routes.home
+        : Routes.completeProfile;
+
+    // Stay on "Complete profile" (its "Skip for now" still works because only
+    // these entry screens are redirected, not Home).
     if (isCompleteProfile) return null;
-    // Just verified the email: next step of onboarding is the profile.
-    if (isVerifyEmail) return Routes.completeProfile;
-    if (isPublicAuthRoute || isOnboarding) return Routes.home;
+    if (isVerifyEmail ||
+        isPublicAuthRoute ||
+        isOnboarding ||
+        location == Routes.splash) {
+      return landing;
+    }
 
     return null;
   },
@@ -171,6 +187,10 @@ final GoRouter appRouter = GoRouter(
       path: Routes.resetSent,
       builder: (context, state) =>
           ResetSentView(email: state.extra as String? ?? ''),
+    ),
+    GoRoute(
+      path: Routes.splash,
+      builder: (context, state) => const SplashView(),
     ),
     GoRoute(
       path: Routes.publicTerms,

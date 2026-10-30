@@ -22,7 +22,7 @@ void setupServiceLocator() {
 
   if (!getIt.isRegistered<AuthSession>()) {
     getIt.registerLazySingleton<AuthSession>(
-      () => AuthSession(getIt<FirebaseAuth>()),
+      () => AuthSession(getIt<FirebaseAuth>(), getIt<FirebaseFirestore>()),
     );
   }
 

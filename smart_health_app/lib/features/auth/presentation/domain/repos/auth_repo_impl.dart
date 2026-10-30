@@ -118,7 +118,7 @@ class AuthRepoImpl implements AuthRepo {
 
       if (imageFile != null) {
         final storageRef = firebaseStorage.ref().child(
-          'profile_images/${user.uid}.jpg',
+          'users/${user.uid}/profile.jpg',
         );
         await storageRef.putFile(imageFile);
         imageUrl = await storageRef.getDownloadURL();
@@ -164,10 +164,10 @@ class AuthRepoImpl implements AuthRepo {
 
       // رفع الصورة الجديدة لو تم اختيارها
       if (imageFile != null) {
-        final ref = firebaseStorage.ref().child('user_photos/$uid.jpg');
+        final ref = firebaseStorage.ref().child('users/$uid/profile.jpg');
         await ref.putFile(imageFile);
         final imageUrl = await ref.getDownloadURL();
-        updatedData['photoUrl'] = imageUrl;
+        updatedData['profilePicUrl'] = imageUrl;
       }
 
       await firestore.collection('users').doc(uid).update(updatedData);

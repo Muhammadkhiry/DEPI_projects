@@ -1,4 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -11,11 +12,65 @@ import 'package:smart_health_app/features/auth/presentation/domain/repos/auth_re
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
-class VerifyEmailView extends StatelessWidget {
+class VerifyEmailView extends StatefulWidget {
   /// Optional override. By default the signed-in user's email is shown.
   final String? email;
 
   const VerifyEmailView({super.key, this.email});
+
+  @override
+  State<VerifyEmailView> createState() => _VerifyEmailViewState();
+}
+
+class _VerifyEmailViewState extends State<VerifyEmailView> {
+  static const int _resendCooldownSeconds = 60;
+
+  Timer? _pollTimer;
+  Timer? _cooldownTimer;
+  int _secondsLeft = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check every 3 seconds so the screen moves on by itself once the user
+    // has tapped the link in the email.
+    _pollTimer = Timer.periodic(const Duration(seconds: 3), (_) async {
+      final verified = await getIt<AuthSession>().refreshEmailVerified();
+      if (verified && mounted) {
+        _pollTimer?.cancel();
+        context.go(Routes.completeProfile);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    _cooldownTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startCooldown() {
+    setState(() => _secondsLeft = _resendCooldownSeconds);
+    _cooldownTimer?.cancel();
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() => _secondsLeft--);
+      if (_secondsLeft <= 0) timer.cancel();
+    });
+  }
+
+  Future<void> _resend() async {
+    final error = await getIt<AuthSession>().sendVerificationEmail();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(error ?? 'Verification email sent again!')),
+    );
+    if (error == null) _startCooldown();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +146,7 @@ class VerifyEmailView extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      email ?? getIt<AuthSession>().email ?? '',
+                      widget.email ?? getIt<AuthSession>().email ?? '',
                       style: AppTextStyles.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -169,33 +224,21 @@ class VerifyEmailView extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                onPressed: () async {
-                  try {
-                    await FirebaseAuth.instance.currentUser
-                        ?.sendEmailVerification();
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Verification email sent again!'),
-                        ),
-                      );
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: ${e.toString()}')),
-                      );
-                    }
-                  }
-                },
-                child: const Row(
+                onPressed: _secondsLeft > 0 ? null : _resend,
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.refresh, size: 18, color: AppColors.primary),
-                    SizedBox(width: 8),
+                    const Icon(
+                      Icons.refresh,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 8),
                     Text(
-                      'Resend email',
-                      style: TextStyle(
+                      _secondsLeft > 0
+                          ? 'Resend in ${_secondsLeft}s'
+                          : 'Resend email',
+                      style: const TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
                         fontSize: 15,

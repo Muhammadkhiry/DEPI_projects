@@ -1,0 +1,12 @@
+{
+  "name": "smart-health-seed",
+  "private": true,
+  "type": "module",
+  "description": "Fills the local Firebase emulators with demo accounts and data.",
+  "scripts": {
+    "seed": "node seed.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}
