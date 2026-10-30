@@ -69,6 +69,10 @@ class AuthSession extends ChangeNotifier {
         .listen(
           (doc) {
             if (_user == null) return;
+            // The document disappears while the account is being deleted. Keep
+            // the last known profile until the user is signed out, so the
+            // router does not bounce to "Complete profile" in between.
+            if (!doc.exists && _profile != null) return;
             _profile = doc.exists ? UserModel.fromFirestore(doc) : null;
             _setProfileStatus(
               (_profile?.isProfileCompleted ?? false)

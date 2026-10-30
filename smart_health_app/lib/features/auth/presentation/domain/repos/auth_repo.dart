@@ -20,6 +20,10 @@ abstract class AuthRepo {
 
   Future<Either<Failure, void>> logout();
 
+  /// Permanently deletes the signed-in user's data (Firestore + Storage) and
+  /// then the Auth account. Needs the current password to re-authenticate.
+  Future<Either<Failure, void>> deleteAccount({required String password});
+
   Future<Either<Failure, void>> completeProfile({
     required String name,
     required String phoneNumber,
