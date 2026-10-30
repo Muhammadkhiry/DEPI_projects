@@ -45,7 +45,9 @@ class _LoginViewState extends State<LoginView> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Logged in successfully!')),
             );
-            context.go(Routes.home);
+            // Let the router decide: Home, or "Complete profile" if the
+            // profile is not finished yet (it waits on the splash screen).
+            context.go(Routes.splash);
           } else if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

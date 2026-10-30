@@ -102,6 +102,76 @@ class AuthRepoImpl implements AuthRepo {
   }
 
   @override
+  Future<Either<Failure, void>> deleteAccount({required String password}) async {
+    try {
+      final user = firebaseAuth.currentUser;
+      final email = user?.email;
+      if (user == null || email == null) {
+        return Left(ServerFailure('User is not authenticated.'));
+      }
+
+      // 1. Prove it is the owner (Firebase also requires a recent login to
+      //    delete an account).
+      await user.reauthenticateWithCredential(
+        EmailAuthProvider.credential(email: email, password: password),
+      );
+
+      final uid = user.uid;
+
+      // 2. Delete the user's data while still signed in: the security rules
+      //    only allow the owner to delete it.
+      //    data here (e.g. blood requests).
+      await _deleteStorageFolder(firebaseStorage.ref('users/$uid'));
+      final userDoc = firestore.collection('users').doc(uid);
+      await _deleteQuery(userDoc.collection('records'));
+      await _deleteQuery(userDoc.collection('donations'));
+      await _deleteQuery(
+        firestore.collection('appointments').where('userId', isEqualTo: uid),
+      );
+      await _deleteQuery(
+        firestore.collection('slots').where('userId', isEqualTo: uid),
+      );
+      await userDoc.delete();
+
+      // 3. Finally delete the Auth account. This signs the user out, so the
+      //    router sends them back to the login screen by itself.
+      await user.delete();
+      return const Right(null);
+    } on FirebaseAuthException catch (e) {
+      return Left(ServerFailure.fromFirebaseAuth(e.code));
+    } on FirebaseException catch (e) {
+      return Left(ServerFailure('Could not delete your data (${e.code}).'));
+    } catch (e) {
+      return Left(ServerFailure('Failed to delete the account.'));
+    }
+  }
+
+  /// Deletes every file under [folder] (including sub-folders).
+  Future<void> _deleteStorageFolder(Reference folder) async {
+    final result = await folder.listAll();
+    for (final file in result.items) {
+      await file.delete();
+    }
+    for (final subFolder in result.prefixes) {
+      await _deleteStorageFolder(subFolder);
+    }
+  }
+
+  /// Deletes every document matched by [query], in batches (Firestore allows
+  /// at most 500 writes per batch).
+  Future<void> _deleteQuery(Query<Map<String, dynamic>> query) async {
+    while (true) {
+      final snapshot = await query.limit(400).get();
+      if (snapshot.docs.isEmpty) return;
+      final batch = firestore.batch();
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> completeProfile({
     required String name,
     required String phoneNumber,
@@ -118,7 +188,7 @@ class AuthRepoImpl implements AuthRepo {
 
       if (imageFile != null) {
         final storageRef = firebaseStorage.ref().child(
-          'profile_images/${user.uid}.jpg',
+          'users/${user.uid}/profile.jpg',
         );
         await storageRef.putFile(imageFile);
         imageUrl = await storageRef.getDownloadURL();
@@ -164,10 +234,10 @@ class AuthRepoImpl implements AuthRepo {
 
       // رفع الصورة الجديدة لو تم اختيارها
       if (imageFile != null) {
-        final ref = firebaseStorage.ref().child('user_photos/$uid.jpg');
+        final ref = firebaseStorage.ref().child('users/$uid/profile.jpg');
         await ref.putFile(imageFile);
         final imageUrl = await ref.getDownloadURL();
-        updatedData['photoUrl'] = imageUrl;
+        updatedData['profilePicUrl'] = imageUrl;
       }
 
       await firestore.collection('users').doc(uid).update(updatedData);

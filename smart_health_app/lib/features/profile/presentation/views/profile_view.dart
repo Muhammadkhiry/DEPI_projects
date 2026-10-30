@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_health_app/core/config/app_config.dart';
 import 'package:smart_health_app/core/routing/routes.dart';
+import 'package:smart_health_app/core/services/auth_session.dart';
 import 'package:smart_health_app/core/services/service_locator.dart';
 import 'package:smart_health_app/features/auth/presentation/domain/repos/auth_repo.dart';
 
@@ -17,6 +18,42 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   bool isDonorActive = true;
+
+  final AuthSession _session = getIt<AuthSession>();
+
+  @override
+  void initState() {
+    super.initState();
+    // The profile document is live: rebuild whenever it changes.
+    _session.addListener(_onSessionChanged);
+  }
+
+  @override
+  void dispose() {
+    _session.removeListener(_onSessionChanged);
+    super.dispose();
+  }
+
+  void _onSessionChanged() {
+    if (mounted) setState(() {});
+  }
+
+  String _initials(String name) {
+    final parts = name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .toList();
+    if (parts.isEmpty) return '?';
+    if (parts.length == 1) return parts.first[0].toUpperCase();
+    return (parts.first[0] + parts.last[0]).toUpperCase();
+  }
+
+  String _bloodTypeLabel(String? type) {
+    if (type == null || type.isEmpty) return 'Blood type not set';
+    if (type == 'O-') return 'O- Universal Donor';
+    return '$type Blood Type';
+  }
 
   Future<void> _logout() async {
     final messenger = ScaffoldMessenger.of(context);
@@ -36,6 +73,16 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    final profile = _session.profile;
+    final String name = profile?.name?.trim() ?? '';
+    final String displayName = name.isEmpty ? 'Your name' : name;
+    final String email = (profile?.email.isNotEmpty ?? false)
+        ? profile!.email
+        : (_session.email ?? '');
+    final String bloodType = profile?.bloodType ?? '';
+    final String photoUrl = profile?.profilePicUrl ?? '';
+    final bool hasPhoto = photoUrl.isNotEmpty;
+
     return Scaffold(
       backgroundColor: AppColors.neutralBg,
       body: SafeArea(
@@ -87,12 +134,12 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                       const SizedBox(width: 8),
                       // Avatar Badges
-                     const CircleAvatar(
+                      CircleAvatar(
                         radius: 16,
                         backgroundColor: AppColors.primary,
-                        child:  Text(
-                          'SJ',
-                          style: TextStyle(
+                        child: Text(
+                          _initials(displayName),
+                          style: const TextStyle(
                             color: AppColors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -124,11 +171,23 @@ class _ProfileViewState extends State<ProfileView> {
                     // Avatar Image with Camera Badge
                     Stack(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 36,
-                          backgroundImage: NetworkImage(
-                            'https://img.freepik.com/free-photo/doctor-offering-medical-teleconsultation_23-2149329007.jpg',
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.12,
                           ),
+                          backgroundImage: hasPhoto
+                              ? NetworkImage(photoUrl)
+                              : null,
+                          child: hasPhoto
+                              ? null
+                              : Text(
+                                  _initials(displayName),
+                                  style: AppTextStyles.headlineLarge.copyWith(
+                                    color: AppColors.primary,
+                                    fontSize: 22,
+                                  ),
+                                ),
                         ),
                         Positioned(
                           bottom: 0,
@@ -157,7 +216,7 @@ class _ProfileViewState extends State<ProfileView> {
                           Row(
                             children: [
                               Text(
-                                'Muhammad Khairy',
+                                displayName,
                                 style: AppTextStyles.bodyLarge.copyWith(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 17,
@@ -173,7 +232,7 @@ class _ProfileViewState extends State<ProfileView> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'khairy@example.com',
+                            email,
                             style: AppTextStyles.bodyMedium.copyWith(
                               fontSize: 13,
                             ),
@@ -199,7 +258,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'O- Universal Donor',
+                                  _bloodTypeLabel(bloodType),
                                   style: AppTextStyles.bodyMedium.copyWith(
                                     color: AppColors.secondary,
                                     fontWeight: FontWeight.bold,
@@ -387,7 +446,7 @@ class _ProfileViewState extends State<ProfileView> {
                     _buildTileItem(
                       icon: Icons.person_outline,
                       title: 'Personal info',
-                      subtitle: 'Muhammad Khairy',
+                      subtitle: displayName,
                       onTap: () => context.push(
                         "${Routes.profile}/${Routes.personalInfo}",
                       ),
@@ -400,7 +459,9 @@ class _ProfileViewState extends State<ProfileView> {
                     _buildTileItem(
                       icon: Icons.medical_information_outlined,
                       title: 'Medical info',
-                      subtitle: 'Blood type O-, Penicillin allergy',
+                      subtitle: bloodType.isEmpty
+                          ? 'Add your medical info'
+                          : 'Blood type $bloodType',
                       onTap: () => context.push(
                         "${Routes.profile}/${Routes.medicalInfo}",
                       ),

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/config/app_config.dart';
+import 'package:smart_health_app/core/routing/routes.dart';
+import 'package:smart_health_app/core/services/service_locator.dart';
 import 'package:smart_health_app/core/theme/app_colors.dart';
 import 'package:smart_health_app/core/theme/app_text_styles.dart';
+import 'package:smart_health_app/features/auth/presentation/domain/repos/auth_repo.dart';
 
 void showDeleteAccountDialog(BuildContext context) {
   bool isPasswordObscured = true;
   final TextEditingController passwordController = TextEditingController();
+  bool isDeleting = false;
+  String? errorText;
 
   showDialog(
     context: context,
@@ -75,9 +81,11 @@ void showDeleteAccountDialog(BuildContext context) {
                   const SizedBox(height: 8),
                   TextField(
                     controller: passwordController,
+                    enabled: !isDeleting,
                     obscureText: isPasswordObscured,
                     style: AppTextStyles.bodyLarge,
                     decoration: InputDecoration(
+                      errorText: errorText,
                       prefixIcon: const Icon(
                         Icons.lock_outline,
                         size: 20,
@@ -130,16 +138,63 @@ void showDeleteAccountDialog(BuildContext context) {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () {
-                        context.pop(); // Close dialog
-                        context.go('/login'); // Redirect after delete
-                      },
-                      child: Text(
-                        'Delete account',
-                        style: AppTextStyles.buttonText.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      onPressed: isDeleting
+                          ? null
+                          : () async {
+                              final password = passwordController.text;
+                              if (password.isEmpty) {
+                                setState(
+                                  () => errorText =
+                                      'Enter your password to continue',
+                                );
+                                return;
+                              }
+                              setState(() {
+                                isDeleting = true;
+                                errorText = null;
+                              });
+
+                              final navigator = Navigator.of(
+                                context,
+                                rootNavigator: true,
+                              );
+                              final router = GoRouter.of(context);
+                              final result = await getIt<AuthRepo>()
+                                  .deleteAccount(password: password);
+
+                              result.fold(
+                                (failure) => setState(() {
+                                  isDeleting = false;
+                                  errorText = failure.errMessage;
+                                }),
+                                (_) {
+                                  if (navigator.mounted && navigator.canPop()) {
+                                    navigator.pop(); // close the dialog
+                                  }
+                                  // The router sends the user to the login
+                                  // screen by itself once the account is
+                                  // gone. BYPASS_AUTH turns the guards off.
+                                  if (AppConfig.bypassAuth) {
+                                    router.go(Routes.login);
+                                  }
+                                },
+                              );
+                            },
+                      child: isDeleting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.white,
+                              ),
+                            )
+                          : Text(
+                              'Delete account',
+                              style: AppTextStyles.buttonText.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -156,7 +211,7 @@ void showDeleteAccountDialog(BuildContext context) {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () => context.pop(),
+                      onPressed: isDeleting ? null : () => context.pop(),
                       child: Text(
                         'Cancel',
                         style: AppTextStyles.bodyLarge.copyWith(

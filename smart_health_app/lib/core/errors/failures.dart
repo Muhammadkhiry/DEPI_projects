@@ -18,6 +18,17 @@ class ServerFailure extends Failure {
         return ServerFailure('The email address is invalid.');
       case 'weak-password':
         return ServerFailure('The password is too weak.');
+      // Newer Firebase projects return this for a wrong email OR password.
+      case 'invalid-credential':
+        return ServerFailure('Incorrect email or password.');
+      case 'too-many-requests':
+        return ServerFailure('Too many attempts. Please try again later.');
+      case 'network-request-failed':
+        return ServerFailure('No internet connection. Please try again.');
+      case 'user-disabled':
+        return ServerFailure('This account has been disabled.');
+      case 'requires-recent-login':
+        return ServerFailure('Please sign in again and retry.');
       default:
         return ServerFailure('An unexpected authentication error occurred.');
     }
