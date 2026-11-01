@@ -57,22 +57,22 @@ class DefaultFirebaseOptions {
     projectId: 'smart-health-96efc',
     storageBucket: 'smart-health-96efc.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAXPsxdXFtSD-f2cKawD7HvsfRQaSFMHwo',
     appId: '1:1087164392323:ios:517f78ec1a1ee5c1298cb6',
     messagingSenderId: '1087164392323',
     projectId: 'smart-health-96efc',
     storageBucket: 'smart-health-96efc.firebasestorage.app',
+    iosClientId: '1087164392323-rliq23thrmgu1b7ou7ap8j2r0h0985bo.apps.googleusercontent.com',
     iosBundleId: 'com.example.smartHealthApp',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAXPsxdXFtSD-f2cKawD7HvsfRQaSFMHwo',
     appId: '1:1087164392323:ios:517f78ec1a1ee5c1298cb6',
     messagingSenderId: '1087164392323',
     projectId: 'smart-health-96efc',
     storageBucket: 'smart-health-96efc.firebasestorage.app',
+    iosClientId: '1087164392323-rliq23thrmgu1b7ou7ap8j2r0h0985bo.apps.googleusercontent.com',
     iosBundleId: 'com.example.smartHealthApp',
   );
 
