@@ -4,7 +4,7 @@
 # Every owner needs WRITE access to the repository (Settings -> Collaborators).
 #
 #   Dev1 (platform, auth, profile) = @Muhammadkhiry
-#   Team = @amani-a7med, @engnoursabek-source, @malakhanysayed208-cell
+#   Dev2 (design system, home)     = @malakhanysayed208-cell
 
 # Single-owner files (Dev1)
 /smart_health_app/pubspec.yaml                            @Muhammadkhiry
@@ -18,7 +18,6 @@
 /smart_health_app/firebase.json                           @Muhammadkhiry
 /smart_health_app/analysis_options.yaml                   @Muhammadkhiry
 
-# Design system (Dev2). TODO: replace the three names with Dev2's username
-# only, so that just one person is asked to review.
-/smart_health_app/lib/core/theme/                         @amani-a7med @engnoursabek-source @malakhanysayed208-cell
-/smart_health_app/lib/core/widgets/                       @amani-a7med @engnoursabek-source @malakhanysayed208-cell
+# Design system (Dev2)
+/smart_health_app/lib/core/theme/                         @malakhanysayed208-cell
+/smart_health_app/lib/core/widgets/                       @malakhanysayed208-cell
