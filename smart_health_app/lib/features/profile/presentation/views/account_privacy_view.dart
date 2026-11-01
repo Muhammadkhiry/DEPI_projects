@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/services/auth_session.dart';
+import 'package:smart_health_app/core/services/service_locator.dart';
+import 'package:smart_health_app/features/auth/presentation/domain/repos/auth_repo.dart';
 import 'package:smart_health_app/features/profile/presentation/views/widgets/delete_dialog.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -7,6 +10,28 @@ import '../../../../core/theme/app_text_styles.dart';
 
 class AccountPrivacyView extends StatelessWidget {
   const AccountPrivacyView({super.key});
+
+  /// "Change password": emails the user a reset link (no password is typed
+  /// in the app, so there is nothing to re-authenticate).
+  Future<void> _sendPasswordResetLink(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final email = getIt<AuthSession>().email;
+    if (email == null) return;
+
+    final result = await getIt<AuthRepo>().sendPasswordResetEmail(
+      email: email,
+    );
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          result.fold(
+            (failure) => failure.errMessage,
+            (_) => 'Password reset link sent to $email',
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +201,7 @@ class AccountPrivacyView extends StatelessWidget {
                         ),
                       ),
                       subtitle: Text(
-                        'Last updated 3 months ago via Fire',
+                        'We will email you a reset link',
                         style: AppTextStyles.bodyMedium.copyWith(fontSize: 12),
                       ),
                       trailing: const Icon(
@@ -184,7 +209,7 @@ class AccountPrivacyView extends StatelessWidget {
                         size: 14,
                         color: AppColors.textMuted,
                       ),
-                      onTap: () {},
+                      onTap: () => _sendPasswordResetLink(context),
                     ),
                   ],
                 ),

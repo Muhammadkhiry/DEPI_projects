@@ -90,6 +90,13 @@ class AuthCubit extends Cubit<AuthState> {
     String? bloodType,
     bool? isWillingToDonate,
     File? imageFile,
+    String? dateOfBirth,
+    String? gender,
+    String? allergies,
+    String? chronicConditions,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
+    String? emergencyContactRelationship,
   }) async {
     emit(AuthLoading());
     final result = await authRepo.updateUserProfile(
@@ -98,6 +105,13 @@ class AuthCubit extends Cubit<AuthState> {
       bloodType: bloodType,
       isWillingToDonate: isWillingToDonate,
       imageFile: imageFile,
+      dateOfBirth: dateOfBirth,
+      gender: gender,
+      allergies: allergies,
+      chronicConditions: chronicConditions,
+      emergencyContactName: emergencyContactName,
+      emergencyContactPhone: emergencyContactPhone,
+      emergencyContactRelationship: emergencyContactRelationship,
     );
     result.fold((failure) => emit(AuthFailure(failure.errMessage)), (_) {
       emit(ProfileUpdatedSuccess());

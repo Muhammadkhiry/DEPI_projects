@@ -15,8 +15,9 @@ class MedicalInfoView extends StatefulWidget {
 }
 
 class _MedicalInfoViewState extends State<MedicalInfoView> {
-  String selectedBloodType = 'O-';
-  String selectedRelationship = 'Spouse / Partner';
+  // Not pre-selected: a wrong default blood type would be saved silently.
+  String? selectedBloodType;
+  String? selectedRelationship;
 
   final List<String> bloodTypes = [
     'A+',
@@ -68,12 +69,19 @@ class _MedicalInfoViewState extends State<MedicalInfoView> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is UserDataLoaded) {
+            final user = state.userModel;
+            _allergiesController.text = user.allergies ?? '';
+            _chronicController.text = user.chronicConditions ?? '';
+            _contactNameController.text = user.emergencyContactName ?? '';
+            _contactPhoneController.text = user.emergencyContactPhone ?? '';
             setState(() {
-              if (state.userModel.bloodType != null &&
-                  state.userModel.bloodType!.isNotEmpty) {
-                selectedBloodType = state.userModel.bloodType!;
+              if (user.bloodType != null && user.bloodType!.isNotEmpty) {
+                selectedBloodType = user.bloodType;
               }
-              // لو عندك حقول مضافة في الـ Model زي الـ Allergies أو الـ Emergency contact تقدر تملأها هنا برضه
+              final relationship = user.emergencyContactRelationship;
+              if (relationships.contains(relationship)) {
+                selectedRelationship = relationship;
+              }
             });
           } else if (state is ProfileUpdatedSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -433,7 +441,7 @@ class _MedicalInfoViewState extends State<MedicalInfoView> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                selectedRelationship,
+                                selectedRelationship ?? 'Not set',
                                 style: AppTextStyles.bodyMedium.copyWith(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
@@ -579,6 +587,17 @@ class _MedicalInfoViewState extends State<MedicalInfoView> {
                           : () {
                               context.read<AuthCubit>().updateProfile(
                                 bloodType: selectedBloodType,
+                                allergies: _allergiesController.text.trim(),
+                                chronicConditions: _chronicController.text
+                                    .trim(),
+                                emergencyContactName: _contactNameController
+                                    .text
+                                    .trim(),
+                                emergencyContactPhone: _contactPhoneController
+                                    .text
+                                    .trim(),
+                                emergencyContactRelationship:
+                                    selectedRelationship,
                               );
                             },
                       child: isLoading

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,7 +9,9 @@ import 'package:smart_health_app/core/routing/app_router.dart';
 import 'package:smart_health_app/core/theme/app_colors.dart';
 import 'package:smart_health_app/core/utils/cache_helper.dart';
 
+import 'core/services/monitoring_service.dart';
 import 'core/services/service_locator.dart';
+import 'core/services/auth_session.dart';
 import 'firebase_options.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -30,6 +34,13 @@ void main() async {
   }
   setupServiceLocator();
   await CacheHelper.init();
+
+  // Crash reporting + analytics (task 1.14). Only active in release builds.
+  await MonitoringService.init();
+  final session = getIt<AuthSession>();
+  unawaited(MonitoringService.setUser(session.uid));
+  session.addListener(() => unawaited(MonitoringService.setUser(session.uid)));
+
   runApp(const SmartHealthApp());
 }
 

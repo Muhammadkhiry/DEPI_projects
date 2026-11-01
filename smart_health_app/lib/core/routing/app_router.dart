@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_health_app/core/config/app_config.dart';
+import 'package:smart_health_app/core/routing/auth_redirect.dart';
 import 'package:smart_health_app/core/services/auth_session.dart';
 import 'package:smart_health_app/core/services/service_locator.dart';
 import 'package:smart_health_app/core/utils/cache_helper.dart';
@@ -108,65 +109,14 @@ final GoRouter appRouter = GoRouter(
   refreshListenable: getIt<AuthSession>(),
   redirect: (context, state) {
     final session = getIt<AuthSession>();
-    final bool isOnboardingSeen = CacheHelper.getBool(key: 'isOnboardingSeen');
-    final String location = state.matchedLocation;
-
-    final bool isOnboarding = location == Routes.onboarding;
-    // Screens a signed-out user is allowed to see.
-    final bool isPublicAuthRoute =
-        location == Routes.login ||
-        location == Routes.signUp ||
-        location == Routes.forgotPassword ||
-        location == Routes.resetSent;
-    final bool isVerifyEmail = location == Routes.verifyEmail;
-    final bool isCompleteProfile = location == Routes.completeProfile;
-
-    // 1. Onboarding not seen yet: it is the only screen allowed.
-    if (!isOnboardingSeen) {
-      return isOnboarding ? null : Routes.onboarding;
-    }
-
-    // Terms must be readable before signing up.
-    if (location == Routes.publicTerms) return null;
-
-    // Dev shortcut (flutter run --dart-define=BYPASS_AUTH=true):
-    // skip the login guards so every screen can be opened.
-    if (AppConfig.bypassAuth) {
-      return isOnboarding ? Routes.home : null;
-    }
-
-    // 2. Signed out: only login / sign up / forgot password screens.
-    if (!session.isLoggedIn) {
-      return isPublicAuthRoute ? null : Routes.login;
-    }
-
-    // 3. Signed in but email not verified yet: stay on the verify screen.
-    if (!session.isEmailVerified) {
-      return isVerifyEmail ? null : Routes.verifyEmail;
-    }
-
-    // 4. Signed in and verified: wait until we know whether the profile is
-    //    complete (a few hundred ms, shows the splash screen).
-    if (session.profileStatus == ProfileStatus.unknown) {
-      return location == Routes.splash ? null : Routes.splash;
-    }
-
-    // Where a user lands after signing in or verifying the email.
-    final String landing = session.profileStatus == ProfileStatus.completed
-        ? Routes.home
-        : Routes.completeProfile;
-
-    // Stay on "Complete profile" (its "Skip for now" still works because only
-    // these entry screens are redirected, not Home).
-    if (isCompleteProfile) return null;
-    if (isVerifyEmail ||
-        isPublicAuthRoute ||
-        isOnboarding ||
-        location == Routes.splash) {
-      return landing;
-    }
-
-    return null;
+    return resolveRedirect(
+      location: state.matchedLocation,
+      isOnboardingSeen: CacheHelper.getBool(key: 'isOnboardingSeen'),
+      isLoggedIn: session.isLoggedIn,
+      isEmailVerified: session.isEmailVerified,
+      profileStatus: session.profileStatus,
+      bypassAuth: AppConfig.bypassAuth,
+    );
   },
   routes: [
     // 1. Auth & Onboarding Flow
@@ -422,6 +372,10 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: 'record-details',
                   builder: (context, state) => _placeholder('Record Details'),
+                ),
+                GoRoute(
+                  path: 'review-document',
+                  builder: (context, state) => _placeholder('Review Document'),
                 ),
                 GoRoute(
                   path: 'upload-prescription',

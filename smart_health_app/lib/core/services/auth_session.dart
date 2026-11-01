@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:smart_health_app/core/constants/firestore_paths.dart';
 import 'package:smart_health_app/features/auth/presentation/data/models/user_model.dart';
 
 /// Whether the signed-in user has finished the "Complete your profile" step.
@@ -38,6 +39,7 @@ class AuthSession extends ChangeNotifier {
   late final StreamSubscription<User?> _subscription;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
   _profileSubscription;
+  Timer? _profileTimeout;
 
   User? _user;
   UserModel? _profile;
@@ -56,14 +58,24 @@ class AuthSession extends ChangeNotifier {
   void _listenToProfile() {
     unawaited(_profileSubscription?.cancel());
     _profileSubscription = null;
+    _profileTimeout?.cancel();
     _profile = null;
     _profileStatus = ProfileStatus.unknown;
 
     final uid = _user?.uid;
     if (uid == null) return;
 
+    // Offline on a fresh install: Firestore never answers, so don't leave the
+    // user on the splash screen forever.
+    _profileTimeout = Timer(const Duration(seconds: 8), () {
+      if (_profileStatus == ProfileStatus.unknown && _user != null) {
+        debugPrint('AuthSession: profile did not load in time, continuing.');
+        _setProfileStatus(ProfileStatus.completed);
+      }
+    });
+
     _profileSubscription = _firestore
-        .collection('users')
+        .collection(FirestorePaths.users)
         .doc(uid)
         .snapshots()
         .listen(
@@ -124,6 +136,7 @@ class AuthSession extends ChangeNotifier {
 
   @override
   void dispose() {
+    _profileTimeout?.cancel();
     unawaited(_subscription.cancel());
     unawaited(_profileSubscription?.cancel());
     super.dispose();

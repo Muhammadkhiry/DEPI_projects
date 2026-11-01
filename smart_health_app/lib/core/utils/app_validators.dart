@@ -3,7 +3,9 @@ class AppValidators {
     if (value == null || value.trim().isEmpty) {
       return 'Email is required';
     }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    // Letters, digits and . _ + - before the @ (so name+tag@gmail.com works);
+    // any top-level domain of 2+ letters (.com, .health, .museum...).
+    final emailRegex = RegExp(r'^[\w.+-]+@([\w-]+\.)+[\w-]{2,}$');
     if (!emailRegex.hasMatch(value.trim())) {
       return 'Please enter a valid email address';
     }
