@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:smart_health_app/core/constants/firestore_paths.dart';
 import 'package:smart_health_app/core/errors/failures.dart';
 import 'package:smart_health_app/features/auth/presentation/data/models/user_model.dart';
 
@@ -64,7 +65,7 @@ class AuthRepoImpl implements AuthRepo {
         );
 
         await firestore
-            .collection('users')
+            .collection(FirestorePaths.users)
             .doc(user.uid)
             .set(userModel.toFirestore(), SetOptions(merge: true));
       }
@@ -120,16 +121,23 @@ class AuthRepoImpl implements AuthRepo {
 
       // 2. Delete the user's data while still signed in: the security rules
       //    only allow the owner to delete it.
+      //    TODO(Dev3/Dev4/Dev5): add any new collection that stores the user's
       //    data here (e.g. blood requests).
-      await _deleteStorageFolder(firebaseStorage.ref('users/$uid'));
-      final userDoc = firestore.collection('users').doc(uid);
-      await _deleteQuery(userDoc.collection('records'));
-      await _deleteQuery(userDoc.collection('donations'));
+      await _deleteStorageFolder(
+        firebaseStorage.ref(StoragePaths.userFolder(uid)),
+      );
+      final userDoc = firestore.collection(FirestorePaths.users).doc(uid);
+      await _deleteQuery(userDoc.collection(FirestorePaths.records));
+      await _deleteQuery(userDoc.collection(FirestorePaths.donations));
       await _deleteQuery(
-        firestore.collection('appointments').where('userId', isEqualTo: uid),
+        firestore
+            .collection(FirestorePaths.appointments)
+            .where('userId', isEqualTo: uid),
       );
       await _deleteQuery(
-        firestore.collection('slots').where('userId', isEqualTo: uid),
+        firestore
+            .collection(FirestorePaths.slots)
+            .where('userId', isEqualTo: uid),
       );
       await userDoc.delete();
 
@@ -188,7 +196,7 @@ class AuthRepoImpl implements AuthRepo {
 
       if (imageFile != null) {
         final storageRef = firebaseStorage.ref().child(
-          'users/${user.uid}/profile.jpg',
+          StoragePaths.profilePhoto(user.uid),
         );
         await storageRef.putFile(imageFile);
         imageUrl = await storageRef.getDownloadURL();
@@ -202,7 +210,10 @@ class AuthRepoImpl implements AuthRepo {
         'profilePicUrl': ?imageUrl,
       };
 
-      await firestore.collection('users').doc(user.uid).update(updateData);
+      await firestore
+          .collection(FirestorePaths.users)
+          .doc(user.uid)
+          .update(updateData);
       await user.updateDisplayName(name);
 
       return const Right(null);
@@ -218,6 +229,13 @@ class AuthRepoImpl implements AuthRepo {
     String? bloodType,
     bool? isWillingToDonate,
     File? imageFile,
+    String? dateOfBirth,
+    String? gender,
+    String? allergies,
+    String? chronicConditions,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
+    String? emergencyContactRelationship,
   }) async {
     try {
       final uid = firebaseAuth.currentUser?.uid;
@@ -228,19 +246,38 @@ class AuthRepoImpl implements AuthRepo {
       if (name != null) updatedData['name'] = name;
       if (phone != null) updatedData['phoneNumber'] = phone;
       if (bloodType != null) updatedData['bloodType'] = bloodType;
+      if (dateOfBirth != null) updatedData['dateOfBirth'] = dateOfBirth;
+      if (gender != null) updatedData['gender'] = gender;
+      if (allergies != null) updatedData['allergies'] = allergies;
+      if (chronicConditions != null) {
+        updatedData['chronicConditions'] = chronicConditions;
+      }
+      if (emergencyContactName != null) {
+        updatedData['emergencyContactName'] = emergencyContactName;
+      }
+      if (emergencyContactPhone != null) {
+        updatedData['emergencyContactPhone'] = emergencyContactPhone;
+      }
+      if (emergencyContactRelationship != null) {
+        updatedData['emergencyContactRelationship'] =
+            emergencyContactRelationship;
+      }
       if (isWillingToDonate != null) {
         updatedData['isWillingToDonate'] = isWillingToDonate;
       }
 
       // رفع الصورة الجديدة لو تم اختيارها
       if (imageFile != null) {
-        final ref = firebaseStorage.ref().child('users/$uid/profile.jpg');
+        final ref = firebaseStorage.ref().child(StoragePaths.profilePhoto(uid));
         await ref.putFile(imageFile);
         final imageUrl = await ref.getDownloadURL();
         updatedData['profilePicUrl'] = imageUrl;
       }
 
-      await firestore.collection('users').doc(uid).update(updatedData);
+      await firestore
+          .collection(FirestorePaths.users)
+          .doc(uid)
+          .update(updatedData);
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure('Failed to update profile: ${e.toString()}'));
@@ -255,7 +292,10 @@ class AuthRepoImpl implements AuthRepo {
         return Left(ServerFailure('User not logged in'));
       }
 
-      final doc = await firestore.collection('users').doc(uid).get();
+      final doc = await firestore
+          .collection(FirestorePaths.users)
+          .doc(uid)
+          .get();
       if (!doc.exists || doc.data() == null) {
         return Left(ServerFailure('User data not found'));
       }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_health_app/core/constants/pref_keys.dart';
+import 'package:smart_health_app/core/utils/cache_helper.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -23,6 +25,29 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
     '1 hour before',
     '2 hours before',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Defaults are "on" until the user changes them.
+    isAppointmentsEnabled = _readBool(PrefKeys.notifAppointments);
+    isBloodRequestsEnabled = _readBool(PrefKeys.notifBloodRequests);
+    isRecordSavedEnabled = _readBool(PrefKeys.notifRecordSaved);
+    final savedSchedule = CacheHelper.getData(key: PrefKeys.notifSchedule);
+    if (savedSchedule is String && scheduleOptions.contains(savedSchedule)) {
+      selectedSchedule = savedSchedule;
+    }
+  }
+
+  bool _readBool(String key) {
+    final value = CacheHelper.getData(key: key);
+    return value is! bool || value;
+  }
+
+  /// Preferences are applied instantly and kept on this device.
+  void _save(String key, Object value) {
+    CacheHelper.saveData(key: key, value: value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -217,8 +242,10 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                         Switch(
                           value: isAppointmentsEnabled,
                           activeThumbColor: AppColors.primary,
-                          onChanged: (val) =>
-                              setState(() => isAppointmentsEnabled = val),
+                          onChanged: (val) {
+                            setState(() => isAppointmentsEnabled = val);
+                            _save(PrefKeys.notifAppointments, val);
+                          },
                         ),
                       ],
                     ),
@@ -238,8 +265,10 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                           children: scheduleOptions.map((schedule) {
                             final isSelected = selectedSchedule == schedule;
                             return GestureDetector(
-                              onTap: () =>
-                                  setState(() => selectedSchedule = schedule),
+                              onTap: () {
+                                setState(() => selectedSchedule = schedule);
+                                _save(PrefKeys.notifSchedule, schedule);
+                              },
                               child: Container(
                                 margin: const EdgeInsets.only(right: 8),
                                 padding: const EdgeInsets.symmetric(
@@ -357,8 +386,10 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                         Switch(
                           value: isBloodRequestsEnabled,
                           activeThumbColor: AppColors.primary,
-                          onChanged: (val) =>
-                              setState(() => isBloodRequestsEnabled = val),
+                          onChanged: (val) {
+                            setState(() => isBloodRequestsEnabled = val);
+                            _save(PrefKeys.notifBloodRequests, val);
+                          },
                         ),
                       ],
                     ),
@@ -449,8 +480,10 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                     Switch(
                       value: isRecordSavedEnabled,
                       activeThumbColor: AppColors.primary,
-                      onChanged: (val) =>
-                          setState(() => isRecordSavedEnabled = val),
+                      onChanged: (val) {
+                        setState(() => isRecordSavedEnabled = val);
+                        _save(PrefKeys.notifRecordSaved, val);
+                      },
                     ),
                   ],
                 ),

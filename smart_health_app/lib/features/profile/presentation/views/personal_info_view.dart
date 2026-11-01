@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_cubit.dart';
 import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_state.dart';
 
@@ -15,8 +18,12 @@ class PersonalInfoView extends StatefulWidget {
 }
 
 class _PersonalInfoViewState extends State<PersonalInfoView> {
-  String selectedGender = 'Male';
+  // Not pre-selected: only saved if the user actually picks one.
+  String? selectedGender;
   final List<String> genderOptions = ['Male', 'Female', 'Prefer not to say'];
+
+  String? _photoUrl;
+  File? _pickedImage;
 
   late final TextEditingController _fullNameController;
   late final TextEditingController _emailController;
@@ -42,6 +49,17 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
     _phoneController.dispose();
     _dobController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      imageQuality: 80,
+    );
+    if (picked != null) {
+      setState(() => _pickedImage = File(picked.path));
+    }
   }
 
   // ميثود اختيار تاريخ الميلاد
@@ -78,6 +96,12 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
             _fullNameController.text = state.userModel.name ?? '';
             _emailController.text = state.userModel.email;
             _phoneController.text = state.userModel.phoneNumber ?? '';
+            _dobController.text = state.userModel.dateOfBirth ?? '';
+            setState(() {
+              _photoUrl = state.userModel.profilePicUrl;
+              final gender = state.userModel.gender;
+              if (genderOptions.contains(gender)) selectedGender = gender;
+            });
           } else if (state is ProfileUpdatedSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -156,17 +180,28 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                             CircleAvatar(
                               radius: 44,
                               backgroundColor: AppColors.primary,
-                              child: Text(
-                                _fullNameController.text.isNotEmpty
-                                    ? _fullNameController.text
-                                          .substring(0, 1)
-                                          .toUpperCase()
-                                    : 'MK',
-                                style: AppTextStyles.headlineLarge.copyWith(
-                                  color: AppColors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              backgroundImage: _pickedImage != null
+                                  ? FileImage(_pickedImage!)
+                                  : (_photoUrl != null && _photoUrl!.isNotEmpty
+                                        ? NetworkImage(_photoUrl!)
+                                        : null),
+                              child:
+                                  (_pickedImage != null ||
+                                      (_photoUrl != null &&
+                                          _photoUrl!.isNotEmpty))
+                                  ? null
+                                  : Text(
+                                      _fullNameController.text.isNotEmpty
+                                          ? _fullNameController.text
+                                                .substring(0, 1)
+                                                .toUpperCase()
+                                          : '?',
+                                      style: AppTextStyles.headlineLarge
+                                          .copyWith(
+                                            color: AppColors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
                             ),
                             Positioned(
                               bottom: 0,
@@ -192,7 +227,7 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                         ),
                         const SizedBox(height: 10),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: _pickImage,
                           child: const Text(
                             'Change photo',
                             style: TextStyle(
@@ -578,7 +613,7 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'HIPAA Protected Profile',
+                                'Private Profile',
                                 style: AppTextStyles.bodyLarge.copyWith(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
@@ -586,7 +621,7 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Your personal details are encrypted and stored in your private Firestore user profile.',
+                                'Your personal details are stored in your private Firestore user profile and can only be read by you.',
                                 style: AppTextStyles.bodyMedium.copyWith(
                                   fontSize: 11,
                                 ),
@@ -614,9 +649,23 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                       onPressed: isLoading
                           ? null
                           : () {
+                              final name = _fullNameController.text.trim();
+                              if (name.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Name cannot be empty.'),
+                                  ),
+                                );
+                                return;
+                              }
                               context.read<AuthCubit>().updateProfile(
-                                name: _fullNameController.text.trim(),
+                                name: name,
                                 phone: _phoneController.text.trim(),
+                                dateOfBirth: _dobController.text.isEmpty
+                                    ? null
+                                    : _dobController.text,
+                                gender: selectedGender,
+                                imageFile: _pickedImage,
                               );
                             },
                       child: isLoading

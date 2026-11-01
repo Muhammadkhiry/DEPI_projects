@@ -39,5 +39,14 @@ abstract class AuthRepo {
     String? bloodType,
     bool? isWillingToDonate,
     File? imageFile,
+    // Personal info
+    String? dateOfBirth,
+    String? gender,
+    // Medical info. Pass an empty string to clear a field.
+    String? allergies,
+    String? chronicConditions,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
+    String? emergencyContactRelationship,
   });
 }

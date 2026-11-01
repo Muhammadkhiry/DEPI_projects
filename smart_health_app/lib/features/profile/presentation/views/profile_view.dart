@@ -667,7 +667,12 @@ class _ProfileViewState extends State<ProfileView> {
     String? trailingText,
     required VoidCallback onTap,
   }) {
-    return ListTile(
+    // The tiles sit inside white rounded cards (a DecoratedBox). ListTile paints
+    // its ink on the nearest Material, so give it its own transparent one, or
+    // Flutter throws "ListTile background color or ink splashes may be invisible".
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -709,6 +714,7 @@ class _ProfileViewState extends State<ProfileView> {
         ],
       ),
       onTap: onTap,
+      ),
     );
   }
 }
