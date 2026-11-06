@@ -9,6 +9,10 @@ abstract class Routes {
 
   // Shell Tabs
   static const String home = '/home';
+  static const String notifications = '/home/notifications';
+  static const String emergency = '/home/emergency';
+  static const String sharedStates = '/home/shared-states';
+  static const String requestDetails = '/bloodDonation/request-details';
   static const String doctors = '/doctors';
   static const String bloodDonation = '/bloodDonation';
   static const String medicalRecords = '/medicalRecords';

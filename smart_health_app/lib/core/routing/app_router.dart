@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:smart_health_app/features/blood_donation/presentation/views/request_details_view.dart';
 import 'package:smart_health_app/features/blood_donation/presentation/views/blood_donation_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_health_app/core/utils/cache_helper.dart';
@@ -10,6 +11,9 @@ import 'package:smart_health_app/features/auth/presentation/views/reset_sent_vie
 import 'package:smart_health_app/features/auth/presentation/views/signup_view.dart';
 import 'package:smart_health_app/features/auth/presentation/views/verify_email_view.dart';
 import 'package:smart_health_app/features/onboarding/presentation/views/onboarding_view.dart';
+import 'package:smart_health_app/features/home/presentation/views/home_view.dart';
+import 'package:smart_health_app/features/home/presentation/views/notifications_view.dart';
+import 'package:smart_health_app/features/home/presentation/views/emergency_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/account_privacy_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/help_center_view.dart';
 import 'package:smart_health_app/features/profile/presentation/views/medical_info_view.dart';
@@ -19,6 +23,8 @@ import 'package:smart_health_app/features/profile/presentation/views/profile_vie
 import 'package:smart_health_app/features/profile/presentation/views/terms_conditions_view.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/smart_bottom_navigation_bar.dart';
+import '../widgets/states_sheet.dart';
 import 'routes.dart';
 
 Widget _placeholder(String title) => Scaffold(
@@ -101,39 +107,9 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state, navigationShell) {
         return Scaffold(
           body: navigationShell,
-          bottomNavigationBar: BottomNavigationBar(
+          bottomNavigationBar: SmartBottomNavigationBar(
             currentIndex: navigationShell.currentIndex,
             onTap: (index) => navigationShell.goBranch(index),
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: AppColors.primary,
-            unselectedItemColor: AppColors.textMuted,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.medical_services_outlined),
-                activeIcon: Icon(Icons.medical_services),
-                label: 'Doctors',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.bloodtype_outlined),
-                activeIcon: Icon(Icons.bloodtype),
-                label: 'Blood',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.folder_outlined),
-                activeIcon: Icon(Icons.folder),
-                label: 'Records',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
           ),
         );
       },
@@ -143,11 +119,11 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: Routes.home,
-              builder: (context, state) => _placeholder('Home Dashboard'),
+              builder: (context, state) => const HomeView(),
               routes: [
                 GoRoute(
                   path: 'notifications',
-                  builder: (context, state) => _placeholder('Notifications'),
+                  builder: (context, state) => const NotificationsView(),
                 ),
                 GoRoute(
                   path: 'search-global',
@@ -155,8 +131,11 @@ final GoRouter appRouter = GoRouter(
                 ),
                 GoRoute(
                   path: 'emergency',
-                  builder: (context, state) =>
-                      _placeholder('Emergency Support'),
+                  builder: (context, state) => const EmergencyNumbersView(),
+                ),
+                GoRoute(
+                  path: 'shared-states',
+                  builder: (context, state) => const SharedWidgetsStatesSheet(),
                 ),
                 GoRoute(
                   path: 'banner-details',
@@ -224,8 +203,7 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: Routes.bloodDonation,
-              builder: (context, state) =>
-                  _placeholder('Blood Donation Dashboard'),
+              builder: (context, state) => const BloodDonationDashboardView(),
               routes: [
                 GoRoute(
                   path: 'find-donors',
@@ -237,7 +215,11 @@ final GoRouter appRouter = GoRouter(
                 ),
                 GoRoute(
                   path: 'request-details',
-                  builder: (context, state) => _placeholder('Request Details'),
+                  builder: (context, state) => RequestDetailsView(
+                    role: state.uri.queryParameters['role'] == 'donor'
+                        ? RequestDetailsRole.donor
+                        : RequestDetailsRole.requester,
+                  ),
                 ),
                 GoRoute(
                   path: 'donor-profile',
