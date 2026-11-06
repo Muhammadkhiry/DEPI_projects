@@ -21,7 +21,9 @@ class UserModel {
     this.createdAt,
   });
 
-  factory UserModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+  factory UserModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+  ) {
     final data = snapshot.data();
     return UserModel(
       uid: snapshot.id,
@@ -43,7 +45,9 @@ class UserModel {
       'bloodType': bloodType,
       'profilePicUrl': profilePicUrl,
       'isProfileCompleted': isProfileCompleted,
-      'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
+      'createdAt': createdAt != null
+          ? Timestamp.fromDate(createdAt!)
+          : FieldValue.serverTimestamp(),
     };
   }
 }

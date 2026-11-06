@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import 'package:smart_health_app/core/theme/app_colors.dart';
 import 'package:smart_health_app/core/theme/app_text_styles.dart';
 import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_cubit.dart';
 import 'package:smart_health_app/features/auth/presentation/auth_cubit/auth_state.dart';
+
 class CompleteProfileView extends StatefulWidget {
   const CompleteProfileView({super.key});
 
@@ -55,14 +57,16 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
           if (state is AuthSuccess) {
             context.go(Routes.home);
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errMessage)),
-            );
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.errMessage)));
           }
         },
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 12.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -383,8 +387,8 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                         decoration: BoxDecoration(
                           color: isSelected
                               ? (type == 'O-'
-                                  ? AppColors.secondary
-                                  : AppColors.primary)
+                                    ? AppColors.secondary
+                                    : AppColors.primary)
                               : AppColors.white,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
@@ -484,11 +488,11 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                         ),
                         onPressed: () {
                           context.read<AuthCubit>().completeProfile(
-                                name: 'User Name',
-                                phoneNumber: '',
-                                bloodType: selectedBloodType,
-                                imageFile: _imageFile,
-                              );
+                            name: 'User Name',
+                            phoneNumber: '',
+                            bloodType: selectedBloodType,
+                            imageFile: _imageFile,
+                          );
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,

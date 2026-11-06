@@ -148,9 +148,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: () => context.push(
-                          Routes.resetSent,
-                        ),
+                        onPressed: () => context.push(Routes.resetSent),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

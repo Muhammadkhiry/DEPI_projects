@@ -8,15 +8,11 @@ class FindDoctorsView extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F8F9),
       appBar: AppBar(
-
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
           'Find Doctors',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -34,11 +30,7 @@ class FindDoctorsView extends StatelessWidget {
       ),
       body: const Padding(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-
-          ],
-        ),
+        child: Column(children: []),
       ),
     );
   }

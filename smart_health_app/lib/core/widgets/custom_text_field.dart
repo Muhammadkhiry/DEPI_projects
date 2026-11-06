@@ -10,7 +10,7 @@ class CustomTextField extends StatelessWidget {
   final bool isPassword;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
-  final String? Function(String? value)? validator; 
+  final String? Function(String? value)? validator;
 
   const CustomTextField({
     super.key,
@@ -20,7 +20,7 @@ class CustomTextField extends StatelessWidget {
     this.isPassword = false,
     this.prefixIcon,
     this.suffixIcon,
-    this.validator, 
+    this.validator,
   });
 
   @override
@@ -36,10 +36,10 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        TextFormField( 
+        TextFormField(
           controller: controller,
           obscureText: isPassword,
-          validator: validator, 
+          validator: validator,
           style: AppTextStyles.bodyLarge,
           decoration: InputDecoration(
             hintText: hintText,
@@ -65,17 +65,11 @@ class CustomTextField extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.0,
-              ),
+              borderSide: const BorderSide(color: Colors.red, width: 1.0),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.5,
-              ),
+              borderSide: const BorderSide(color: Colors.red, width: 1.5),
             ),
           ),
         ),

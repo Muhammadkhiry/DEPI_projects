@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -18,7 +19,10 @@ class HelpCenterView extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         children: const [
           ExpansionTile(
-            title: Text('How do I book an appointment?', style: AppTextStyles.bodyLarge),
+            title: Text(
+              'How do I book an appointment?',
+              style: AppTextStyles.bodyLarge,
+            ),
             children: [
               Padding(
                 padding: EdgeInsets.all(12.0),
@@ -30,7 +34,10 @@ class HelpCenterView extends StatelessWidget {
             ],
           ),
           ExpansionTile(
-            title: Text('How does blood donation request work?', style: AppTextStyles.bodyLarge),
+            title: Text(
+              'How does blood donation request work?',
+              style: AppTextStyles.bodyLarge,
+            ),
             children: [
               Padding(
                 padding: EdgeInsets.all(12.0),
@@ -42,7 +49,10 @@ class HelpCenterView extends StatelessWidget {
             ],
           ),
           ExpansionTile(
-            title: Text('Is my medical data secure?', style: AppTextStyles.bodyLarge),
+            title: Text(
+              'Is my medical data secure?',
+              style: AppTextStyles.bodyLarge,
+            ),
             children: [
               Padding(
                 padding: EdgeInsets.all(12.0),

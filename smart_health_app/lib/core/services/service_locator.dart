@@ -16,7 +16,5 @@ void setupServiceLocator() {
   );
 
   // Cubits / Blocs
-  getIt.registerFactory<AuthCubit>(
-    () => AuthCubit(getIt<AuthRepo>()),
-  );
+  getIt.registerFactory<AuthCubit>(() => AuthCubit(getIt<AuthRepo>()));
 }
